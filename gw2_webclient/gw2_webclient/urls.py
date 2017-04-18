@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.auth.views import login, logout
+
+from gw2_app import views
 
 urlpatterns = [
+    url(r'^$', views.homepage, name='homepage'),
+    url(r'^accounts/login/$', login, name='login'),
+    url(r'^accounts/logout/$', logout, name='logout'),
+    url(r'^characters/$', views.getCharacterList, name='characters'),
+    url(r'^characters/info/$', views.getCharacterInfo, name='characterinfo'),
     url(r'^admin/', admin.site.urls),
 ]

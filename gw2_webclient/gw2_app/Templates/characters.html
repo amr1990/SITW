@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Character List</h1>
+        {% for char in characters %}
+            <br><strong>Character name</strong>: {{char}} </br>
+            <table border="1">
+                <tr>
+                    <td><a href="/characters/info/?name={{char}}">Information</a></td>
+                    <td><a href="/characters/stats/?name={{char}}">Gear</a></td>
+                    <td><a href="/characters/inventory/?name={{char}}">Inventory</a></td>
+                </tr>
+            </table>
+            <br> </br>
+        {% endfor %}
+{% endblock %}
