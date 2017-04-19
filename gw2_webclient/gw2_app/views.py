@@ -3,6 +3,8 @@ import json
 import string
 
 import requests
+import urllib2
+import bs4
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render_to_response
@@ -27,7 +29,7 @@ url_services = {
 
 def homepage(request):
     context = RequestContext(request)
-    return render_to_response('homepage.html', {}, context)
+    return render_to_response("homepage.html", {}, context)
 
 
 @login_required
@@ -165,4 +167,29 @@ def getBank(request):
     return render_to_response(
         'bank.html',
         {'bank': return_response_bank},
+        context)
+
+def getEvents(request):
+    context = RequestContext(request)
+    url = urllib2.urlopen('https://wiki.guildwars2.com/wiki/World_boss')
+    htmlpage = url.read()
+    url.close()
+    item_clean = []
+    item_final = []
+    ignore_first = 0
+    page_lxml = bs4.BeautifulSoup(htmlpage, "lxml")
+    event_table = page_lxml.find("table", {"class": "mech1 mw-collapsible mw-collapsed table"})
+    items = event_table.findAll("tr")
+
+    for item in items:
+        if ignore_first == 0:
+            ignore_first += 1
+        else:
+            item_clean.append(item.text.encode("utf-8"))
+    for i in item_clean:
+        item_final.append([line for line in i.split('\n') if line.strip() != ''])
+
+    return render_to_response(
+        'events.html',
+        {'events': item_final},
         context)
