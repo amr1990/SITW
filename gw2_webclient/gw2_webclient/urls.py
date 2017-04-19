@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^characters/info/$', views.getCharacterInfo, name='characterinfo'),
     url(r'^bank/$', views.getBank, name='bank'),
     url(r'^characters/inventory/$', views.getInventory, name='inventory'),
+    url(r'^characters/gear/$', views.getGear, name='gear'),
     url(r'^admin/', admin.site.urls),
 ]

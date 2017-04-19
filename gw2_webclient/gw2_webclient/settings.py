@@ -55,7 +55,7 @@ ROOT_URLCONF = 'gw2_webclient.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/home/jordi/Escritorio/sistemesweb/SITW/gw2_webclient/gw2_app/Templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

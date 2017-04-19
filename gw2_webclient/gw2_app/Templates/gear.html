@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1><strong>Gear for {{name}}</strong></h1>
+{% for name, type, stat in stats %}
+<table border="1", width="500">
+    <tr>
+        <td><strong>Item Name</strong></td>
+        <td>{{name}}</td>
+    </tr>
+    <tr>
+        <td><strong>Item Type</strong></td>
+        <td>{{type}}</td>
+    </tr>
+    {% for i in stat %}
+        <tr>
+            <td>{{i.0}}</td>
+            <td>{{i.1}}</td>
+        </tr>
+    {% endfor %}
+</table>
+<br></br>
+{% endfor %}
+{% endblock %}

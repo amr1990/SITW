@@ -20,6 +20,8 @@ url_services = {
     "account": "account/",
     "bank": "bank/",
     "titles": "titles/",
+    "equipment": "/equipment/",
+    "itemstats": "itemstats/",
 }
 
 
@@ -73,6 +75,7 @@ def getCharacterInfo(request):
         {'charinfo': char_info},
         context)
 
+
 def getInventory(request):
     context = RequestContext(request)
     charname = request.GET.get('name')
@@ -97,6 +100,46 @@ def getInventory(request):
                 return_response_inventory.append((itemname, item["count"]))
 
     return render_to_response('inventory.html', {'inventory': return_response_inventory, 'name': charname}, context)
+
+
+@login_required
+def getGear(request):
+    context = RequestContext(request)
+    charname = request.GET.get('name')
+
+    if request.user.is_authenticated():
+        user = User.objects.get(id=request.user.id)
+        profile = UserProfile.objects.filter(user=user).get()
+        api = profile.apikey
+
+    url = URL + url_services["character"] + charname + url_services["equipment"] + url_services["token"] + api
+    req_gear = requests.get(url)
+    data_gear = json.loads(req_gear.text)
+    return_response_gear = []
+
+    for item in data_gear["equipment"]:
+        url_items = URL + url_services["items"] + str(item["id"])
+        req_items = requests.get(url_items)
+        data_items = json.loads(req_items.text)
+        itemname = data_items["name"]
+        itemtype = data_items["type"]
+        itemdetails = data_items["details"]
+        stat_data = []
+        if "infix_upgrade" in itemdetails.keys():
+            stats = itemdetails["infix_upgrade"]
+            for stat in stats["attributes"]:
+                stat_data.append((stat["attribute"], stat["modifier"]))
+        if "stat_choices" in itemdetails.keys():
+            stats = itemdetails["stat_choices"]
+            for stat in stats:
+                url_stat = URL + url_services["itemstats"] + str(stat)
+                req_stat = requests.get(url_stat)
+                data_stat = json.loads(req_stat.text)
+                stat_data.append(("Stat Choice", data_stat["name"]))
+        return_response_gear.append((itemname, itemtype, stat_data))
+
+    return render_to_response('gear.html', {'stats': return_response_gear, 'name': charname}, context)
+
 
 @login_required
 def getBank(request):
