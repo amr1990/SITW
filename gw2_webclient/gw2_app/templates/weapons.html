@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Weapons Information for {{prof}}</h1>
+    {% for weapon, skill in skills %}
+        <h2>{{weapon}}</h2>
+        <table border="1">
+            <tr>
+                <td><strong>Skill slot</strong></td>
+                <td><strong>Skill name</strong></td>
+                <td><strong>Description</strong></td>
+            </tr>
+            {% for slot, name, desc in skill %}
+                <tr>
+                    <td>{{slot}}</td>
+                    <td>{{name}}</td>
+                    <td>{{desc}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+{% endblock %}

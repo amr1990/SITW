@@ -29,5 +29,9 @@ urlpatterns = [
     url(r'^characters/inventory/$', views.getInventory, name='inventory'),
     url(r'^characters/gear/$', views.getGear, name='gear'),
     url(r'^events/$', views.getEvents, name='events'),
+    url(r'^professions/$', views.getInfoProfession, name='professions'),
+    url(r'^professions/(?P<prof_id>.*)/training/$', views.getTraining, name='training'),
+    url(r'^professions/(?P<prof_id>.*)/skills/$', views.getProfessionSkills, name='professionskills'),
+    url(r'^professions/(?P<prof_id>.*)/weapons/$', views.getWeapons, name='weapons'),
     url(r'^admin/', admin.site.urls),
 ]
