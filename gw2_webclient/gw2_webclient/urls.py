@@ -29,5 +29,9 @@ urlpatterns = [
     url(r'^characters/inventory/$', views.getInventory, name='inventory'),
     url(r'^characters/gear/$', views.getGear, name='gear'),
     url(r'^accounts/profile/$', views.homepage, name='homepage'),
+    url(r'^events/$', views.getEvents, name='events'),
+    url(r'^tradingpost/$', views.tradingPost, name='trading_post'),
+    url(r'^tradingpost/current/$', views.getTradingPostCurrent, name='trading_post_current'),
+    url(r'^tradingpost/history/$', views.getTradingPostHistory, name='trading_post_history'),
     url(r'^admin/', admin.site.urls),
 ]

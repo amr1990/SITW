@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<meta charset="UTF-8">
+<h1>Information for trading post history:</h1>
+    <h2> Buys </h2>
+    <table border="1">
+        <tr>
+            <td><strong>Name</strong></td>
+            <td><strong>Quantity</strong></td>
+            <td><strong>Price (Coppers)</strong></td>
+            <td><strong>Date created</strong></td>
+        </tr>
+        {% for items in buys %}
+            <tr>
+                <td>{{ items.0 }}</td>
+                <td>{{ items.1 }}</td>
+                <td>{{ items.2 }}</td>
+                <td>{{ items.3 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h2> Sells </h2>
+    <table border="1">
+        <tr>
+            <td><strong>Name</strong></td>
+            <td><strong>Quantity</strong></td>
+            <td><strong>Price (Coppers)</strong></td>
+            <td><strong>Date created</strong></td>
+        </tr>
+        {% for items in sells %}
+            <tr>
+                <td>{{ items.0 }}</td>
+                <td>{{ items.1 }}</td>
+                <td>{{ items.2 }}</td>
+                <td>{{ items.3 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

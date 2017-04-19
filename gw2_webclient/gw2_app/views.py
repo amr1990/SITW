@@ -3,6 +3,8 @@ import json
 import string
 
 import requests
+import urllib2
+import bs4
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render_to_response
@@ -22,12 +24,17 @@ url_services = {
     "titles": "titles/",
     "equipment": "/equipment/",
     "itemstats": "itemstats/",
+    "trading_post": "commerce/transactions/",
+    "current": "current/",
+    "history": "history/",
+    "buys": "buys/",
+    "sells": "sells/",
 }
 
 
 def homepage(request):
     context = RequestContext(request)
-    return render_to_response('homepage.html', {}, context)
+    return render_to_response("homepage.html", {}, context)
 
 
 @login_required
@@ -165,4 +172,128 @@ def getBank(request):
     return render_to_response(
         'bank.html',
         {'bank': return_response_bank},
+        context)
+
+def getEvents(request):
+    context = RequestContext(request)
+    url = urllib2.urlopen('https://wiki.guildwars2.com/wiki/World_boss')
+    htmlpage = url.read()
+    url.close()
+    item_clean = []
+    item_final = []
+    ignore_first = 0
+    page_lxml = bs4.BeautifulSoup(htmlpage, "lxml")
+    event_table = page_lxml.find("table", {"class": "mech1 mw-collapsible mw-collapsed table"})
+    items = event_table.findAll("tr")
+
+    for item in items:
+        if ignore_first == 0:
+            ignore_first += 1
+        else:
+            item_clean.append(item.text.encode("utf-8"))
+    for i in item_clean:
+        item_final.append([line for line in i.split('\n') if line.strip() != ''])
+
+    return render_to_response(
+        'events.html',
+        {'events': item_final},
+        context)
+
+
+def tradingPost(request):
+    context = RequestContext(request)
+    return render_to_response("trading_post.html", context)
+
+
+@login_required
+def getTradingPostCurrent(request):
+    context = RequestContext(request)
+
+    if request.user.is_authenticated():
+        user = User.objects.get(id=request.user.id)
+        profile = UserProfile.objects.filter(user=user).get()
+        api = profile.apikey
+    URL_currentinfobuys = URL + url_services["trading_post"] + url_services["current"] \
+                      + url_services["buys"] + url_services["token"] + api
+    URL_currentinfosells = URL + url_services["trading_post"] + url_services["current"] \
+                      + url_services["sells"] + url_services["token"] + api
+    req_currentinfobuys = requests.get(URL_currentinfobuys)
+    req_currentinfosells = requests.get(URL_currentinfosells)
+    data_currentinfobuys = json.loads(req_currentinfobuys.text)
+    data_currentinfosells = json.loads(req_currentinfosells.text)
+
+    return_response_current_buys = []
+    return_response_current_sells = []
+
+    for item in data_currentinfobuys:
+        url_items = URL + url_services["items"] + str(item["item_id"])
+        req_items = requests.get(url_items)
+        data_items = json.loads(req_items.text)
+        itemname = data_items["name"]
+        return_response_current_buys.append((itemname.encode("utf-8"),
+                                        item["quantity"],
+                                        item["price"],
+                                        item["created"].encode("utf-8")))
+
+    for item in data_currentinfosells:
+        url_items = URL + url_services["items"] + str(item["item_id"])
+        req_items = requests.get(url_items)
+        data_items = json.loads(req_items.text)
+        itemname = data_items["name"]
+        return_response_current_sells.append((itemname.encode("utf-8"),
+                                        item["quantity"],
+                                        item["price"],
+                                        item["created"].encode("utf-8")))
+
+    return render_to_response(
+        'trading_post_current.html',
+        {'buys': return_response_current_buys, 'sells': return_response_current_sells },
+        context)
+
+
+@login_required
+def getTradingPostHistory(request):
+    context = RequestContext(request)
+
+    if request.user.is_authenticated():
+        user = User.objects.get(id=request.user.id)
+        profile = UserProfile.objects.filter(user=user).get()
+        api = profile.apikey
+    URL_historyinfobuys = URL + url_services["trading_post"] + url_services["history"] \
+                      + url_services["buys"] + url_services["token"] + api
+    URL_historyinfosells = URL + url_services["trading_post"] + url_services["history"] \
+                      + url_services["sells"] + url_services["token"] + api
+    req_historyinfobuys = requests.get(URL_historyinfobuys)
+    req_historyinfosells = requests.get(URL_historyinfosells)
+    data_historyinfobuys = json.loads(req_historyinfobuys.text)
+    data_historyinfosells = json.loads(req_historyinfosells.text)
+
+    return_response_history_buys = []
+    return_response_history_sells = []
+
+    for item in data_historyinfobuys:
+        url_items = URL + url_services["items"] + str(item["item_id"])
+        req_items = requests.get(url_items)
+        data_items = json.loads(req_items.text)
+        itemname = data_items["name"]
+        return_response_history_buys.append((itemname.encode("utf-8"),
+                                        item["quantity"],
+                                        item["price"],
+                                        item["created"].encode("utf-8"),
+                                        item["purchased"].encode("utf-8")))
+
+    for item in data_historyinfosells:
+        url_items = URL + url_services["items"] + str(item["item_id"])
+        req_items = requests.get(url_items)
+        data_items = json.loads(req_items.text)
+        itemname = data_items["name"]
+        return_response_history_sells.append((itemname.encode("utf-8"),
+                                        item["quantity"],
+                                        item["price"],
+                                        item["created"].encode("utf-8"),
+                                        item["purchased"].encode("utf-8")))
+
+    return render_to_response(
+        'trading_post_history.html',
+        {'buys': return_response_history_buys, 'sells': return_response_history_sells },
         context)
