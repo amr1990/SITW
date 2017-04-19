@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Professions</h1>
+    <!--{{professions}}-->
+    {% for profession in professions %}
+        <br><strong>{{profession}}</strong>: <table border="1"><tr><td><a href="/professions/{{profession}}/training/">Training</a></td><td><a href="/professions/{{profession}}/weapons/">Weapons</a></td><td><a href="/professions/{{profession}}/skills/">Profession Skills</a></td></tr></table></br>
+    {% endfor %}
+{% endblock %}

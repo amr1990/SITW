@@ -2,6 +2,7 @@
 import json
 import string
 
+
 import requests
 import urllib2
 import bs4
@@ -24,6 +25,9 @@ url_services = {
     "titles": "titles/",
     "equipment": "/equipment/",
     "itemstats": "itemstats/",
+    "professions": "professions",
+    "skills": "skills/",
+    "traits": "traits/",
     "trading_post": "commerce/transactions/",
     "current": "current/",
     "history": "history/",
@@ -174,6 +178,7 @@ def getBank(request):
         {'bank': return_response_bank},
         context)
 
+
 def getEvents(request):
     context = RequestContext(request)
     url = urllib2.urlopen('https://wiki.guildwars2.com/wiki/World_boss')
@@ -197,6 +202,104 @@ def getEvents(request):
     return render_to_response(
         'events.html',
         {'events': item_final},
+        context)
+
+
+def getInfoProfession(request):
+    context = RequestContext(request)
+    URL_professions = URL + url_services["professions"]
+    req_professions = requests.get(URL_professions)
+    data_professions = json.loads(req_professions.text)
+
+    return render_to_response(
+        'professions.html',
+        {'professions': data_professions},
+        context)
+
+
+def getTraining(request, prof_id):
+    context = RequestContext(request)
+    profnameurl = "/" + prof_id
+    URL_professions = URL + url_services["professions"] + profnameurl
+    req_professions = requests.get(URL_professions)
+    data_professions = json.loads(req_professions.text)
+    trainings = data_professions["training"]
+    track_list = []
+    return_list = []
+
+    for training in trainings:
+        for track in training["track"]:
+            if track["type"] == "Skill":
+                url_skills = URL + url_services["skills"] + str(track["skill_id"])
+                req_skills = requests.get(url_skills)
+                data = json.loads(req_skills.text)
+            else:
+                url_traits = URL + url_services["traits"] + str(track["trait_id"])
+                req_traits = requests.get(url_traits)
+                data = json.loads(req_traits.text)
+            track_list.append((data["name"], data["description"], track["type"]))
+        return_list.append([training["name"], track_list])
+        track_list = []
+
+    return render_to_response(
+        'training.html',
+        {'trainings': return_list,
+         'prof': prof_id},
+        context)
+
+
+def getWeapons(request, prof_id):
+    context = RequestContext(request)
+    profnameurl = "/" + prof_id
+    URL_professions = URL + url_services["professions"] + profnameurl
+    req_professions = requests.get(URL_professions)
+    data_professions = json.loads(req_professions.text)
+    weapons = data_professions["weapons"]
+    weaponlist = weapons.keys()
+    data_skills = []
+    response = []
+    skills = []
+    cont = 0
+
+    for key in weaponlist:
+        data_skills.append(weapons[key]["skills"])
+
+    for skill in data_skills:
+        for id in skill:
+            url_wskills = URL + url_services["skills"] + str(id["id"])
+            req_wskills = requests.get(url_wskills)
+            data_wskills = json.loads(req_wskills.text)
+            skills.append((id["slot"], data_wskills["name"], data_wskills["description"]))
+        response.append([weaponlist[cont], skills])
+        skills = []
+        cont += 1
+
+    return render_to_response(
+        'weapons.html',
+        {'weapons': weaponlist,
+         'skills': response,
+         'prof': prof_id},
+        context)
+
+
+def getProfessionSkills(request, prof_id):
+    context = RequestContext(request)
+    profnameurl = "/" + prof_id
+    URL_professions = URL + url_services["professions"] + profnameurl
+    req_professions = requests.get(URL_professions)
+    data_professions = json.loads(req_professions.text)
+    return_skills = []
+
+    for skills in data_professions["skills"]:
+        url_skills = URL + url_services["skills"] + str(skills["id"])
+        req_skills = requests.get(url_skills)
+        data_skills = json.loads(req_skills.text)
+        return_skills.append((data_skills["name"], skills["slot"], data_skills["description"]))
+
+    return render_to_response(
+        'professionskills.html',
+        {'skills': return_skills,
+         'prof': prof_id},
         context)
 
 
