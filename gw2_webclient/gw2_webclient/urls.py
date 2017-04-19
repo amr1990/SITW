@@ -28,5 +28,6 @@ urlpatterns = [
     url(r'^bank/$', views.getBank, name='bank'),
     url(r'^characters/inventory/$', views.getInventory, name='inventory'),
     url(r'^characters/gear/$', views.getGear, name='gear'),
+    url(r'^accounts/profile/$', views.homepage, name='homepage'),
     url(r'^admin/', admin.site.urls),
 ]
