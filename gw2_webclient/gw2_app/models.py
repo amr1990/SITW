@@ -90,3 +90,26 @@ class PvePersonalStory(PveMode):
 
     def __unicode__(self):
         return self.current_story_step_name
+
+class PvpMode(GameMode):
+    pvp_id = models.AutoField(primary_key=True)
+
+
+class StructuredPvpStat(PvpMode):
+    ranking = models.IntegerField(null=True)
+    win_lose_ratio = models.IntegerField(null=True)
+    league = models.CharField(max_length=20, null=True)
+
+    def __unicode__(self):
+        return self.league
+
+
+class WvwStat(PvpMode):
+    objective_name = models.CharField(max_length=20, null=True)
+    objective_sector = models.CharField(max_length=20, null=True)
+    objective_map = models.CharField(max_length=20, null=True)
+    time_start = models.TimeField(null=True)
+    time_end = models.TimeField(null=True)
+
+    def __unicode__(self):
+        return self.objective_name
