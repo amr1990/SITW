@@ -1,22 +1,32 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
 # Create your models here.
 
+class InstanceMixin(object):
+    """Makes sure that no more than nine instance of a given model is created."""
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User)
-    apikey = models.CharField(max_length=100)
+    def clean(self):
+        model = self.__class__
+        if model.objects.count() > 8:
+            raise ValidationError("Can only create 9 %s instance" % model.__name__)
+        super(InstanceMixin, self).clean()
+
+
+class PlayerProfile(models.Model):
+    user = models.OneToOneField(User, unique=True)
+    apikey = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
         return self.user.username
 
 
-class Profession(models.Model):
+class Profession(InstanceMixin, models.Model):
     PROFESSIONS = (
         ('Guardian', 'Guardian'),
         ('Mesmer', 'Mesmer'),
@@ -29,14 +39,14 @@ class Profession(models.Model):
         ('Thief', 'Thief'),
     )
 
-    profession_type = models.CharField(max_length=20, choices=PROFESSIONS)
+    profession_type = models.CharField(max_length=20,unique=True, choices=PROFESSIONS)
+    character = models.ForeignKey('Character', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return self.profession_type
 
 
-
-class Character(models.Model):
+class Character(InstanceMixin, models.Model):
     RACE = (
         ('Norn', 'Norn'),
         ('Asura', 'Asura'),
@@ -48,39 +58,34 @@ class Character(models.Model):
         ('Male', 'Male'),
         ('Female', 'Female'),
     )
+    player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=20, null=False)
-    profession = models.ForeignKey(Profession, on_delete=models.CASCADE)
     race = models.CharField(max_length=10, choices=RACE)
     gender = models.CharField(max_length=10, choices=GENDER)
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])
     guild = models.CharField(max_length=50, blank=True)
 
-class PlayerProfile(models.Model):
-    user = models.OneToOneField(User, unique=True)
-    apikey = models.CharField(max_length=100, blank=True)
-
     def __unicode__(self):
-        return self.user.username
+        return self.name
+
 
 class GameMode(models.Model):
     game_id = models.AutoField(primary_key=True)
     player = models.ManyToManyField(PlayerProfile)
 
-    def __unicode__(self):
-        return self.game_id
 
 class PveMode(GameMode):
     pve_id = models.AutoField(primary_key=True)
 
 
 class PveEvent(PveMode):
+    event_name = models.CharField(max_length=20, null=True)
     event_boss_name = models.CharField(max_length=20, null=True)
     event_hardcore_boss_name = models.CharField(max_length=20, null=True, blank=True)
     event_time = models.TimeField()
-    event_description = models.TextField()
 
     def __unicode__(self):
-        return self.event_boss_name
+        return self.event_name
 
 
 class PvePersonalStory(PveMode):
@@ -90,6 +95,7 @@ class PvePersonalStory(PveMode):
 
     def __unicode__(self):
         return self.current_story_step_name
+
 
 class PvpMode(GameMode):
     pvp_id = models.AutoField(primary_key=True)
@@ -113,3 +119,31 @@ class WvwStat(PvpMode):
 
     def __unicode__(self):
         return self.objective_name
+
+
+class Achievement(models.Model):
+    player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=20, null=True)
+    description = models.TextField(null=True)
+
+    def __unicode__(self):
+        return self.name
+
+
+class DailyAchievement(Achievement):
+    TYPES = (
+        ('PvE', 'Player vs Enviromnent'),
+        ('PvP', 'Player vs Player'),
+        ('Fractal', 'Fractal'),
+    )
+    type = models.CharField(max_length=10, choices=TYPES, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+
+class GeneralAchievement(Achievement):
+    requirements = models.TextField(null=True)
+
+    def __unicode__(self):
+        return self.name

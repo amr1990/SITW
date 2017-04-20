@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from models import UserProfile
+from models import PlayerProfile
 
 URL = "https://api.guildwars2.com/v2/"
 url_services = {
@@ -54,7 +54,7 @@ def getCharacterList(request):
     context = RequestContext(request)
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
     URL_char = URL + url_services["character"] + url_services["token"] + api
     req_char = requests.get(URL_char)
@@ -72,7 +72,7 @@ def getCharacterInfo(request):
     charname = request.GET.get('name')
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
     URL_charinfo = URL + url_services["character"] + charname + url_services["core"] + url_services["token"] + api
     req_charinfo = requests.get(URL_charinfo)
@@ -100,7 +100,7 @@ def getInventory(request):
     charname = request.GET.get('name')
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
 
     url = URL + url_services["character"] + charname + url_services[
@@ -128,7 +128,7 @@ def getGear(request):
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
 
     url = URL + url_services["character"] + charname + url_services["equipment"] + url_services["token"] + api
@@ -165,7 +165,7 @@ def getBank(request):
     context = RequestContext(request)
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
 
     url = URL + url_services["account"] + url_services["bank"] + url_services["token"] + api
@@ -322,7 +322,7 @@ def getTradingPostCurrent(request):
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
     URL_currentinfobuys = URL + url_services["trading_post"] + url_services["current"] \
                       + url_services["buys"] + url_services["token"] + api
@@ -368,7 +368,7 @@ def getTradingPostHistory(request):
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
     URL_historyinfobuys = URL + url_services["trading_post"] + url_services["history"] \
                       + url_services["buys"] + url_services["token"] + api
@@ -447,7 +447,7 @@ def getPvPStats(request):
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
 
     URL_pvpstats = URL + url_services["pvp"] + url_services["stats"] + url_services["token"] + api
@@ -499,7 +499,7 @@ def getPvPGames(request):
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
-        profile = UserProfile.objects.filter(user=user).get()
+        profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
 
     URL_pvpgames = URL + url_services["pvp"] + url_services["games"] \
