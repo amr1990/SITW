@@ -8,7 +8,7 @@ from django.db import models
 # Create your models here.
 
 
-class PlayerProfile(models.Model):
+class UserProfile(models.Model):
     user = models.OneToOneField(User)
     apikey = models.CharField(max_length=100)
 
@@ -55,6 +55,12 @@ class Character(models.Model):
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])
     guild = models.CharField(max_length=50, blank=True)
 
+class PlayerProfile(models.Model):
+    user = models.OneToOneField(User, unique=True)
+    apikey = models.CharField(max_length=100, blank=True)
+
+    def __unicode__(self):
+        return self.user.username
 
 class GameMode(models.Model):
     game_id = models.AutoField(primary_key=True)
@@ -63,25 +69,24 @@ class GameMode(models.Model):
     def __unicode__(self):
         return self.game_id
 
-class PvpMode(GameMode):
-    pvp_id = models.AutoField(primary_key=True)
+class PveMode(GameMode):
+    pve_id = models.AutoField(primary_key=True)
 
 
-class StructuredPvpStat(PvpMode):
-    ranking = models.IntegerField(null=True)
-    win_lose_ratio = models.IntegerField(null=True)
-    league = models.CharField(max_length=20, null=True)
-
-    def __unicode__(self):
-        return self.league
-
-
-class WvwStat(PvpMode):
-    objective_name = models.CharField(max_length=20, null=True)
-    objective_sector = models.CharField(max_length=20, null=True)
-    objective_map = models.CharField(max_length=20, null=True)
-    time_start = models.TimeField(null=True)
-    time_end = models.TimeField(null=True)
+class PveEvent(PveMode):
+    event_boss_name = models.CharField(max_length=20, null=True)
+    event_hardcore_boss_name = models.CharField(max_length=20, null=True, blank=True)
+    event_time = models.TimeField()
+    event_description = models.TextField()
 
     def __unicode__(self):
-        return self.objective_name
+        return self.event_boss_name
+
+
+class PvePersonalStory(PveMode):
+    current_story_step_name = models.CharField(max_length=30, null=True)
+    current_story_objective = models.CharField(max_length=50, null = True)
+    current_story_description = models.TextField(null=True)
+
+    def __unicode__(self):
+        return self.current_story_step_name
