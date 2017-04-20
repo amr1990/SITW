@@ -33,6 +33,14 @@ url_services = {
     "history": "history/",
     "buys": "buys/",
     "sells": "sells/",
+    "achievements": "achievements",
+    "daily": "/daily",
+    "pvp": "pvp/",
+    "stats": "stats",
+    "standings": "standings",
+    "seasons": "seasons/",
+    "games": "games",
+    "maps": "maps/"
 }
 
 
@@ -305,7 +313,7 @@ def getProfessionSkills(request, prof_id):
 
 def tradingPost(request):
     context = RequestContext(request)
-    return render_to_response("trading_post.html", context)
+    return render_to_response("trading_post.html", {}, context)
 
 
 @login_required
@@ -399,4 +407,126 @@ def getTradingPostHistory(request):
     return render_to_response(
         'trading_post_history.html',
         {'buys': return_response_history_buys, 'sells': return_response_history_sells },
+        context)
+
+
+def getDailyAchievement(request):
+    context = RequestContext(request)
+    token = "?id="
+    URL_daily = URL + url_services["achievements"] + url_services["daily"]
+    req_daily = requests.get(URL_daily)
+    data_daily = json.loads(req_daily.text)
+    dailies = []
+    return_response = []
+    dailies.append(data_daily["pve"])
+    dailies.append(data_daily["pvp"])
+    dailies.append(data_daily["wvw"])
+    dailies.append(data_daily["fractals"])
+
+    for i in dailies:
+        for j in i:
+            URL_achiv = URL + url_services["achievements"] + token + str(j["id"])
+            req_achiv = requests.get(URL_achiv)
+            data_achiv = json.loads(req_achiv.text)
+            return_response.append((data_achiv["name"], data_achiv["requirement"]))
+
+    return render_to_response(
+        'daily.html',
+        {'achievements': return_response},
+        context)
+
+
+def pvp(request):
+    context = RequestContext(request)
+    return render_to_response("pvp.html", {}, context)
+
+
+@login_required
+def getPvPStats(request):
+    context = RequestContext(request)
+
+    if request.user.is_authenticated():
+        user = User.objects.get(id=request.user.id)
+        profile = UserProfile.objects.filter(user=user).get()
+        api = profile.apikey
+
+    URL_pvpstats = URL + url_services["pvp"] + url_services["stats"] + url_services["token"] + api
+    req_pvpstats = requests.get(URL_pvpstats)
+    data_pvpstats = json.loads(req_pvpstats.text)
+    URL_standings = URL + url_services["pvp"] + url_services["standings"] \
+                      + url_services["token"] + api
+    req_standings = requests.get(URL_standings)
+    data_standings = json.loads(req_standings.text)
+
+    return_response_winloss_stats = []
+    return_response_standings = []
+    return_response_winloss_professions = []
+
+    return_response_winloss_stats.append((data_pvpstats["aggregate"]["wins"],
+                                         data_pvpstats["aggregate"]["losses"],
+                                         data_pvpstats["ladders"]["unranked"]["wins"],
+                                         data_pvpstats["ladders"]["unranked"]["losses"],
+                                         data_pvpstats["ladders"]["ranked"]["wins"],
+                                         data_pvpstats["ladders"]["ranked"]["losses"]))
+
+    for item in data_standings:
+        url_seasons = URL + url_services["pvp"] + url_services["seasons"] + item["season_id"]
+        req_seasons = requests.get(url_seasons)
+        data_seasons = json.loads(req_seasons.text)
+        result = []
+        season_keys = ["division", "rating", "tier"]
+        for i in item["current"]:
+            if i in season_keys:
+                result.append((item["current"][i]))
+        return_response_standings.append((data_seasons["name"].encode("utf-8"),result))
+
+    for profession in data_pvpstats["professions"]:
+        return_response_winloss_professions.append((profession.encode("utf-8"),
+                                                   data_pvpstats["professions"][profession]["wins"],
+                                                   data_pvpstats["professions"][profession]["losses"]))
+
+    return render_to_response(
+        'pvp_stats.html',
+        {'stats': return_response_winloss_stats,
+         'professions': return_response_winloss_professions,
+         'standings': return_response_standings},
+        context)
+
+
+@login_required
+def getPvPGames(request):
+    context = RequestContext(request)
+
+    if request.user.is_authenticated():
+        user = User.objects.get(id=request.user.id)
+        profile = UserProfile.objects.filter(user=user).get()
+        api = profile.apikey
+
+    URL_pvpgames = URL + url_services["pvp"] + url_services["games"] \
+                      + url_services["token"] + api
+    req_pvpgames = requests.get(URL_pvpgames)
+    data_pvpgames = json.loads(req_pvpgames.text)
+
+    return_response_pvp_games = []
+
+    for game in data_pvpgames:
+        url_current_game = URL + url_services["pvp"] + url_services["games"] +\
+                           url_services["token"] + api + "&id=" + game
+        req_current_game = requests.get(url_current_game)
+        data_current_game = json.loads(req_current_game.text)
+        url_map = URL + url_services["maps"] + str(data_current_game["map_id"])
+        req_map = requests.get(url_map)
+        data_map = json.loads(req_map.text)
+
+
+        return_response_pvp_games.append((data_map["name"].encode("utf-8"),
+                                          data_current_game["result"].encode("utf-8"),
+                                          data_current_game["team"].encode("utf-8"),
+                                          data_current_game["profession"],
+                                          data_current_game["scores"]["red"],
+                                          data_current_game["scores"]["blue"]))
+
+    return render_to_response(
+        'pvp_games.html',
+        {'games': return_response_pvp_games},
         context)

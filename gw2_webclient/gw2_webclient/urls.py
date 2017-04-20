@@ -37,5 +37,9 @@ urlpatterns = [
     url(r'^tradingpost/$', views.tradingPost, name='trading_post'),
     url(r'^tradingpost/current/$', views.getTradingPostCurrent, name='trading_post_current'),
     url(r'^tradingpost/history/$', views.getTradingPostHistory, name='trading_post_history'),
+    url(r'^dailies/$', views.getDailyAchievement, name='dailies'),
+    url(r'^pvp/$', views.pvp, name='pvp'),
+    url(r'^pvp/stats/$', views.getPvPStats, name='pvp_stats'),
+    url(r'^pvp/games/$', views.getPvPGames, name='pvp_games'),
     url(r'^admin/', admin.site.urls),
 ]
