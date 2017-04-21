@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django import forms
 
-from models import UserProfile
+from models import PlayerProfile
 
 
 class UserForm(forms.ModelForm):
@@ -13,5 +13,5 @@ class UserForm(forms.ModelForm):
 
 class PlayerForm(forms.ModelForm):
     class Meta:
-        model = UserProfile
+        model = PlayerProfile
         fields = ('apikey',)

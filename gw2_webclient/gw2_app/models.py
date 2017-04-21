@@ -90,7 +90,7 @@ class PveEvent(PveMode):
 
 class PvePersonalStory(PveMode):
     current_story_step_name = models.CharField(max_length=30, null=True)
-    current_story_objective = models.CharField(max_length=50, null = True)
+    current_story_objective = models.CharField(max_length=50, null=True)
     current_story_description = models.TextField(null=True)
 
     def __unicode__(self):
