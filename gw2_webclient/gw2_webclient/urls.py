@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^$', views.homepage, name='homepage'),
     url(r'^accounts/login/$', login, name='login'),
     url(r'^accounts/logout/$', logout, name='logout'),
+    url(r'^registration/register/$', views.register, name='register'),
     url(r'^characters/$', views.getCharacterList, name='characters'),
     url(r'^characters/info/$', views.getCharacterInfo, name='characterinfo'),
     url(r'^bank/$', views.getBank, name='bank'),
