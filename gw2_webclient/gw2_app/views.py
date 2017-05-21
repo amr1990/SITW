@@ -11,9 +11,14 @@ from django.contrib.auth.models import User
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
-from forms import UserForm
-from models import PlayerProfile
+from forms import UserForm, CreateCharacterForm, EditCharacterForm
+from models import PlayerProfile,Character
+from django.http import HttpResponseRedirect
+from django.utils import timezone
+
+from . import forms
 
 URL = "https://api.guildwars2.com/v2/"
 url_services = {
@@ -578,3 +583,86 @@ def getPvPGames(request):
         'pvp_games.html',
         {'games': return_response_pvp_games},
         context)
+@csrf_exempt
+@login_required
+def createCharacter(request):
+    context = RequestContext(request)
+    if request.method == "POST":
+        CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
+
+        if CreateCharacterForm.is_valid():
+            character = Character(name=CreateCharacterForm.cleaned_data['name'],
+                                        race=CreateCharacterForm.cleaned_data['race'],
+                                        gender=CreateCharacterForm.cleaned_data['gender'],
+                                        level=CreateCharacterForm.cleaned_data['level'],
+                                        guild=CreateCharacterForm.cleaned_data['guild'],
+                                        profession_type=CreateCharacterForm.cleaned_data["profession_type"]
+                                   )
+            character.save()
+
+
+            return HttpResponseRedirect('/characters/create/created')
+
+        else:
+            print(CreateCharacterForm.errors)
+
+    else:
+        CreateCharacterForm = forms.CreateCharacterForm()
+
+    return render_to_response("createcharacter.html", {'CreateCharacterForm': CreateCharacterForm}, context)
+
+@csrf_exempt
+def characterCreated(request):
+    context = RequestContext(request)
+    return render_to_response("charactercreated.html", {}, context)
+
+@login_required
+def list_characters(request):
+    l = []
+    context = RequestContext(request)
+    for i in Character.objects.all():
+        l.append(i)
+    l.reverse()
+    return render_to_response("characters_list.html", {'list': l},context)
+
+@csrf_exempt
+@login_required
+def edit_characters(request):
+    context = RequestContext(request)
+
+    if Character.objects.filter(name=request.GET.get('name')).exists():
+        Character.objects.get(name=request.GET.get('name')).delete()
+        if request.method == "POST":
+            EditCharacterForm = forms.EditCharacterForm(data=request.POST)
+
+            if EditCharacterForm.is_valid():
+                new_character=Character(
+                    name=EditCharacterForm.cleaned_data['name'],
+                    race=EditCharacterForm.cleaned_data['race'],
+                    gender=EditCharacterForm.cleaned_data['gender'],
+                    level=EditCharacterForm.cleaned_data['level'],
+                    guild=EditCharacterForm.cleaned_data['guild'],
+                    profession_type=EditCharacterForm.cleaned_data["profession_type"]
+                )
+                new_character.save()
+                return HttpResponseRedirect("/characters/list")
+    else:
+        EditCharacterForm=forms.EditCharacterForm()
+
+    return render_to_response("edit_characters.html", {'EditCharacterForm': EditCharacterForm}, context)
+
+@csrf_exempt
+@login_required
+def delete_characters(request):
+
+
+    if Character.objects.filter(name=request.GET.get('name')).exists():
+        Character.objects.get(name=request.GET.get('name')).delete()
+
+        return HttpResponseRedirect("/characters/list")
+
+
+
+
+
+
