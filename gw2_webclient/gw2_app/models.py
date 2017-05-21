@@ -39,11 +39,69 @@ class Profession(InstanceMixin, models.Model):
         ('Thief', 'Thief'),
     )
 
-    profession_type = models.CharField(max_length=20,unique=True, choices=PROFESSIONS)
+    profession_type = models.CharField(max_length=20, unique=True, choices=PROFESSIONS)
     character = models.ForeignKey('Character', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return self.profession_type
+
+
+class Specialization(models.Model):
+    name = models.CharField(max_length=50, null=True)
+    profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
+    iselite = models.NullBooleanField()
+
+    def __unicode__(self):
+        return str(self.name)
+
+
+class ProfessionBuild(models.Model):
+    name = models.CharField(max_length=50, null=True)
+    weapons = models.ManyToManyField('Weapon')
+
+    def __unicode__(self):
+        return str(self.name)
+
+
+class Weapon(models.Model):
+    weapontype = models.CharField(max_length=30, null=True)
+
+    def __unicode__(self):
+        return str(self.weapontype)
+
+
+class Build(models.Model):
+    profesion = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
+    spec = models.ForeignKey('Specialization', on_delete=models.CASCADE, null=True)
+
+
+class WeaponSkill(models.Model):
+    name = models.CharField(max_length=30, null=True)
+    description = models.TextField()
+    weapon = models.ForeignKey('Weapon', on_delete=models.CASCADE, null=True)
+    profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
+
+    def __unicode__(self):
+        return str(self.name)
+
+
+class ProfessionSkill(models.Model):
+    name = models.CharField(max_length=30, null=True)
+    description = models.TextField()
+    profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
+
+    def __unicode__(self):
+        return str(self.name)
+
+
+class Trait(models.Model):
+    name = models.CharField(max_length=30, null=True)
+    description = models.TextField()
+    spec = models.ForeignKey('Specialization', on_delete=models.CASCADE, null=True)
+    ismajor = models.NullBooleanField()
+
+    def __unicode__(self):
+        return str(self.name)
 
 
 class Character(InstanceMixin, models.Model):

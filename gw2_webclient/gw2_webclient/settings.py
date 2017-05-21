@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gw2_app',
+    'gw2_app.management.commands',
 ]
 
 MIDDLEWARE = [
