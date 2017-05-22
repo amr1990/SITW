@@ -1,7 +1,7 @@
 {%extends "base.html" %}
 {% block content %}
 <div class="text-center">
-    <h1>List of Characters</h1>
+    <h1>Customized Characters</h1>
 </div>
 
 
@@ -23,7 +23,7 @@
                 <td>{{ i.level }}</td>
                 <td>{{ i.guild }}</td>
                 <td>{{ i.profession_type }}</td>
-                <td><a href="/characters/edit/?name={{i.name}}"><strong>Edit</strong></a></td>
+                <td><a href="/characters/{{i.name}}/edit/"><strong>Edit</strong></a></td>
                 <td><a href="/characters/delete/?name={{i.name}}"><strong>Delete</strong></a></td>
             </tr>
     {% endfor %}

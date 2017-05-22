@@ -40,6 +40,7 @@ class Character(models.Model):
         ('Male', 'Male'),
         ('Female', 'Female'),
     )
+
     date = models.DateTimeField(null=True)
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=20, null=False,unique=True)
@@ -60,6 +61,9 @@ class Character(models.Model):
     )
 
     profession_type = models.CharField(max_length=20, choices=PROFESSIONS, null=True)
+
+    def get_absolute_url(self):
+        return reverse('edit_char', kwargs={'char_id': self.id})
 
     def __unicode__(self):
         return self.name

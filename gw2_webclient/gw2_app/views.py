@@ -8,7 +8,7 @@ import urllib2
 import bs4
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
@@ -627,29 +627,22 @@ def list_characters(request):
 
 @csrf_exempt
 @login_required
-def edit_characters(request):
-    context = RequestContext(request)
+def edit_characters(request,id):
 
-    if Character.objects.filter(name=request.GET.get('name')).exists():
-        Character.objects.get(name=request.GET.get('name')).delete()
-        if request.method == "POST":
-            EditCharacterForm = forms.EditCharacterForm(data=request.POST)
-
-            if EditCharacterForm.is_valid():
-                new_character=Character(
-                    name=EditCharacterForm.cleaned_data['name'],
-                    race=EditCharacterForm.cleaned_data['race'],
-                    gender=EditCharacterForm.cleaned_data['gender'],
-                    level=EditCharacterForm.cleaned_data['level'],
-                    guild=EditCharacterForm.cleaned_data['guild'],
-                    profession_type=EditCharacterForm.cleaned_data["profession_type"]
-                )
-                new_character.save()
-                return HttpResponseRedirect("/characters/list")
+    if request.method == "POST":
+        CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
+        char = Character.objects.get(name=id)
+        if CreateCharacterForm.is_valid():
+            char_form = forms.CreateCharacterForm(request.POST, instance=char)
+            char_form.save()
+            return HttpResponseRedirect('/characters/list')
+        else:
+            char = Character.objects.get(name=id)
+            CreateCharacterForm = forms.CreateCharacterForm(instance=char)
     else:
-        EditCharacterForm=forms.EditCharacterForm()
+        CreateCharacterForm = forms.CreateCharacterForm()
 
-    return render_to_response("edit_characters.html", {'EditCharacterForm': EditCharacterForm}, context)
+    return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
 
 @csrf_exempt
 @login_required
