@@ -26,22 +26,7 @@ class PlayerProfile(models.Model):
         return self.user.username
 
 
-class Profession(InstanceMixin, models.Model):
-    PROFESSIONS = (
-        ('Guardian', 'Guardian'),
-        ('Mesmer', 'Mesmer'),
-        ('Warrior', 'Warrior'),
-        ('Necromancer', 'Necromancer'),
-        ('Revenant', 'Revenant'),
-        ('Ranger', 'Ranger'),
-        ('Engineer', 'Engineer'),
-        ('Elementalist', 'Elementalist'),
-        ('Thief', 'Thief'),
-    )
-
-    profession_type = models.CharField(max_length=20, unique=True, choices=PROFESSIONS)
-    character = models.ForeignKey('Character', on_delete=models.CASCADE, null=True)
-
+class Character(models.Model):
     def __unicode__(self):
         return self.profession_type
 
@@ -116,12 +101,26 @@ class Character(InstanceMixin, models.Model):
         ('Male', 'Male'),
         ('Female', 'Female'),
     )
+    date = models.DateTimeField(null=True)
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=20, null=False)
+    name = models.CharField(max_length=20, null=False,unique=True)
     race = models.CharField(max_length=10, choices=RACE)
     gender = models.CharField(max_length=10, choices=GENDER)
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])
     guild = models.CharField(max_length=50, blank=True)
+    PROFESSIONS = (
+        ('Guardian', 'Guardian'),
+        ('Mesmer', 'Mesmer'),
+        ('Warrior', 'Warrior'),
+        ('Necromancer', 'Necromancer'),
+        ('Revenant', 'Revenant'),
+        ('Ranger', 'Ranger'),
+        ('Engineer', 'Engineer'),
+        ('Elementalist', 'Elementalist'),
+        ('Thief', 'Thief'),
+    )
+
+    profession_type = models.CharField(max_length=20, choices=PROFESSIONS, null=True)
 
     def __unicode__(self):
         return self.name
