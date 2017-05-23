@@ -24,8 +24,7 @@ class ProfessionSerializer(serializers.ModelSerializer):
 class WeaponSkillSerializer(serializers.ModelSerializer):
     uri = HyperlinkedIdentityField(view_name='weaponskill-detail')
     weapon = WeaponSerializer(read_only=True)
-    profession = ProfessionSerializer(read_only=True)
 
     class Meta:
         model = WeaponSkill
-        fields = ('uri', 'name', 'description', 'weapon', 'profession')
+        fields = ('uri', 'name', 'description', 'weapon')

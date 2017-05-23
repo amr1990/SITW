@@ -26,11 +26,6 @@ class PlayerProfile(models.Model):
         return self.user.username
 
 
-class Character(models.Model):
-    def __unicode__(self):
-        return self.profession_type
-
-
 class Specialization(models.Model):
     name = models.CharField(max_length=50, null=True)
     profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
@@ -49,15 +44,28 @@ class ProfessionBuild(models.Model):
 
 
 class Weapon(models.Model):
-    weapontype = models.CharField(max_length=30, null=True)
+    name = models.CharField(max_length=30, null=True)
+    #build = models.ForeignKey('Build', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return str(self.weapontype)
 
 
 class Build(models.Model):
-    profesion = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
-    spec = models.ForeignKey('Specialization', on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=100, null=True)
+    profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
+    weaponset = models.ManyToManyField('WeaponSet')
+
+    def __unicode__(self):
+        return str(self.name)
+
+
+class WeaponSet(models.Model):
+    name = models.CharField(max_length=50, null=True)
+    weapon1 = models.ManyToManyField('Weapon')
+
+    def __unicode__(self):
+        return str(self.name)
 
 
 class WeaponSkill(models.Model):
@@ -65,6 +73,7 @@ class WeaponSkill(models.Model):
     description = models.TextField()
     weapon = models.ForeignKey('Weapon', on_delete=models.CASCADE, null=True)
     profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
+    #build = models.ForeignKey('Build', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return str(self.name)
@@ -74,6 +83,7 @@ class ProfessionSkill(models.Model):
     name = models.CharField(max_length=30, null=True)
     description = models.TextField()
     profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
+    build = models.ForeignKey('Build', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return str(self.name)
@@ -90,37 +100,15 @@ class Trait(models.Model):
 
 
 class Character(InstanceMixin, models.Model):
-    RACE = (
-        ('Norn', 'Norn'),
-        ('Asura', 'Asura'),
-        ('Sylvary', 'Sylvary'),
-        ('Charr', 'Charr'),
-        ('Human', 'Human'),
-    )
-    GENDER = (
-        ('Male', 'Male'),
-        ('Female', 'Female'),
-    )
     date = models.DateTimeField(null=True)
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=20, null=False,unique=True)
-    race = models.CharField(max_length=10, choices=RACE)
-    gender = models.CharField(max_length=10, choices=GENDER)
+    name = models.CharField(max_length=20, null=False, unique=True)
+    race = models.CharField(max_length=10)
+    gender = models.CharField(max_length=10)
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])
     guild = models.CharField(max_length=50, blank=True)
-    PROFESSIONS = (
-        ('Guardian', 'Guardian'),
-        ('Mesmer', 'Mesmer'),
-        ('Warrior', 'Warrior'),
-        ('Necromancer', 'Necromancer'),
-        ('Revenant', 'Revenant'),
-        ('Ranger', 'Ranger'),
-        ('Engineer', 'Engineer'),
-        ('Elementalist', 'Elementalist'),
-        ('Thief', 'Thief'),
-    )
 
-    profession_type = models.CharField(max_length=20, choices=PROFESSIONS, null=True)
+    profession_type = models.CharField(max_length=20, null=True)
 
     def __unicode__(self):
         return self.name
@@ -189,7 +177,7 @@ class Achievement(models.Model):
 
 class DailyAchievement(Achievement):
     TYPES = (
-        ('PvE', 'Player vs Enviromnent'),
+        ('PvE', 'Player vs Environment'),
         ('PvP', 'Player vs Player'),
         ('Fractal', 'Fractal'),
     )

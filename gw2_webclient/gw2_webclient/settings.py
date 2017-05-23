@@ -39,7 +39,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'gw2_app',
     'gw2_app.management.commands',
+    'rest_framework',
+    'rest_framework_xml',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES':
+        ('rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',), 'PAGINATE_BY': 10,
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.FormParser', 'rest_framework.parsers.JSONParser',
+        'rest_framework_xml.parsers.XMLParser', 'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.BrowsableAPIRenderer', 'rest_framework.renderers.JSONRenderer',
+        'rest_framework_xml.renderers.XMLRenderer',)
+    ,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,7 +86,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gw2_webclient.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
@@ -81,7 +95,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -101,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -114,7 +126,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/

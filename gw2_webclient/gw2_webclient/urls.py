@@ -13,17 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 
 from gw2_app import views
-
-
+import gw2_app
 
 urlpatterns = [
-
     url(r'^$', views.homepage, name='homepage'),
+    url(r'^api/', include('gw2_app.urls')),
     url(r'^accounts/login/$', login, name='login'),
     url(r'^accounts/logout/$', logout, name='logout'),
     url(r'^registration/register/$', views.register, name='register'),
@@ -33,7 +32,7 @@ urlpatterns = [
     url(r'^characters/create/$', views.createCharacter, name='create_character'),
     url(r'^characters/create/created$', views.characterCreated, name='character_created'),
     url(r'^characters/list/$', views.list_characters, name='characters_list'),
-    url(r'^characters/edit/$', views.edit_characters, name='edit_characters'),
+    url(r'^characters/edit/$', views.create_build, name='edit_characters'),
     url(r'^characters/delete/$', views.delete_characters, name='delete_characters'),
     url(r'^characters/inventory/$', views.getInventory, name='inventory'),
     url(r'^characters/gear/$', views.getGear, name='gear'),

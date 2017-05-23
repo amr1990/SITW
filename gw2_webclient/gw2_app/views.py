@@ -1,23 +1,20 @@
 # encoding=utf8
 import json
 import string
-
-
-import requests
 import urllib2
+
 import bs4
+import requests
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
+from rest_framework import generics
 
-from forms import UserForm, CreateCharacterForm, EditCharacterForm
-from models import PlayerProfile,Character
-from django.http import HttpResponseRedirect
-from django.utils import timezone
-
+from forms import UserForm
+from models import *
+from serializers import WeaponSerializer, ProfessionSerializer, WeaponSkillSerializer
 from . import forms
 
 URL = "https://api.guildwars2.com/v2/"
@@ -83,7 +80,7 @@ def register(request):
         # Print problems to the terminal.
         # They'll also be shown to the user.
         else:
-            print user_form.errors
+            print(user_form.errors)
 
     # Not a HTTP POST, so we render our form using two ModelForm instances.
     # These forms will be blank, ready for user input.
@@ -378,9 +375,9 @@ def getTradingPostCurrent(request):
         profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
     URL_currentinfobuys = URL + url_services["trading_post"] + url_services["current"] \
-                      + url_services["buys"] + url_services["token"] + api
+                          + url_services["buys"] + url_services["token"] + api
     URL_currentinfosells = URL + url_services["trading_post"] + url_services["current"] \
-                      + url_services["sells"] + url_services["token"] + api
+                           + url_services["sells"] + url_services["token"] + api
     req_currentinfobuys = requests.get(URL_currentinfobuys)
     req_currentinfosells = requests.get(URL_currentinfosells)
     data_currentinfobuys = json.loads(req_currentinfobuys.text)
@@ -395,9 +392,9 @@ def getTradingPostCurrent(request):
         data_items = json.loads(req_items.text)
         itemname = data_items["name"]
         return_response_current_buys.append((itemname.encode("utf-8"),
-                                        item["quantity"],
-                                        item["price"],
-                                        item["created"].encode("utf-8")))
+                                             item["quantity"],
+                                             item["price"],
+                                             item["created"].encode("utf-8")))
 
     for item in data_currentinfosells:
         url_items = URL + url_services["items"] + str(item["item_id"])
@@ -405,13 +402,13 @@ def getTradingPostCurrent(request):
         data_items = json.loads(req_items.text)
         itemname = data_items["name"]
         return_response_current_sells.append((itemname.encode("utf-8"),
-                                        item["quantity"],
-                                        item["price"],
-                                        item["created"].encode("utf-8")))
+                                              item["quantity"],
+                                              item["price"],
+                                              item["created"].encode("utf-8")))
 
     return render_to_response(
         'trading_post_current.html',
-        {'buys': return_response_current_buys, 'sells': return_response_current_sells },
+        {'buys': return_response_current_buys, 'sells': return_response_current_sells},
         context)
 
 
@@ -424,9 +421,9 @@ def getTradingPostHistory(request):
         profile = PlayerProfile.objects.filter(user=user).get()
         api = profile.apikey
     URL_historyinfobuys = URL + url_services["trading_post"] + url_services["history"] \
-                      + url_services["buys"] + url_services["token"] + api
+                          + url_services["buys"] + url_services["token"] + api
     URL_historyinfosells = URL + url_services["trading_post"] + url_services["history"] \
-                      + url_services["sells"] + url_services["token"] + api
+                           + url_services["sells"] + url_services["token"] + api
     req_historyinfobuys = requests.get(URL_historyinfobuys)
     req_historyinfosells = requests.get(URL_historyinfosells)
     data_historyinfobuys = json.loads(req_historyinfobuys.text)
@@ -441,10 +438,10 @@ def getTradingPostHistory(request):
         data_items = json.loads(req_items.text)
         itemname = data_items["name"]
         return_response_history_buys.append((itemname.encode("utf-8"),
-                                        item["quantity"],
-                                        item["price"],
-                                        item["created"].encode("utf-8"),
-                                        item["purchased"].encode("utf-8")))
+                                             item["quantity"],
+                                             item["price"],
+                                             item["created"].encode("utf-8"),
+                                             item["purchased"].encode("utf-8")))
 
     for item in data_historyinfosells:
         url_items = URL + url_services["items"] + str(item["item_id"])
@@ -452,14 +449,14 @@ def getTradingPostHistory(request):
         data_items = json.loads(req_items.text)
         itemname = data_items["name"]
         return_response_history_sells.append((itemname.encode("utf-8"),
-                                        item["quantity"],
-                                        item["price"],
-                                        item["created"].encode("utf-8"),
-                                        item["purchased"].encode("utf-8")))
+                                              item["quantity"],
+                                              item["price"],
+                                              item["created"].encode("utf-8"),
+                                              item["purchased"].encode("utf-8")))
 
     return render_to_response(
         'trading_post_history.html',
-        {'buys': return_response_history_buys, 'sells': return_response_history_sells },
+        {'buys': return_response_history_buys, 'sells': return_response_history_sells},
         context)
 
 
@@ -507,7 +504,7 @@ def getPvPStats(request):
     req_pvpstats = requests.get(URL_pvpstats)
     data_pvpstats = json.loads(req_pvpstats.text)
     URL_standings = URL + url_services["pvp"] + url_services["standings"] \
-                      + url_services["token"] + api
+                    + url_services["token"] + api
     req_standings = requests.get(URL_standings)
     data_standings = json.loads(req_standings.text)
 
@@ -516,11 +513,11 @@ def getPvPStats(request):
     return_response_winloss_professions = []
 
     return_response_winloss_stats.append((data_pvpstats["aggregate"]["wins"],
-                                         data_pvpstats["aggregate"]["losses"],
-                                         data_pvpstats["ladders"]["unranked"]["wins"],
-                                         data_pvpstats["ladders"]["unranked"]["losses"],
-                                         data_pvpstats["ladders"]["ranked"]["wins"],
-                                         data_pvpstats["ladders"]["ranked"]["losses"]))
+                                          data_pvpstats["aggregate"]["losses"],
+                                          data_pvpstats["ladders"]["unranked"]["wins"],
+                                          data_pvpstats["ladders"]["unranked"]["losses"],
+                                          data_pvpstats["ladders"]["ranked"]["wins"],
+                                          data_pvpstats["ladders"]["ranked"]["losses"]))
 
     for item in data_standings:
         url_seasons = URL + url_services["pvp"] + url_services["seasons"] + item["season_id"]
@@ -531,12 +528,12 @@ def getPvPStats(request):
         for i in item["current"]:
             if i in season_keys:
                 result.append((item["current"][i]))
-        return_response_standings.append((data_seasons["name"].encode("utf-8"),result))
+        return_response_standings.append((data_seasons["name"].encode("utf-8"), result))
 
     for profession in data_pvpstats["professions"]:
         return_response_winloss_professions.append((profession.encode("utf-8"),
-                                                   data_pvpstats["professions"][profession]["wins"],
-                                                   data_pvpstats["professions"][profession]["losses"]))
+                                                    data_pvpstats["professions"][profession]["wins"],
+                                                    data_pvpstats["professions"][profession]["losses"]))
 
     return render_to_response(
         'pvp_stats.html',
@@ -556,21 +553,20 @@ def getPvPGames(request):
         api = profile.apikey
 
     URL_pvpgames = URL + url_services["pvp"] + url_services["games"] \
-                      + url_services["token"] + api
+                   + url_services["token"] + api
     req_pvpgames = requests.get(URL_pvpgames)
     data_pvpgames = json.loads(req_pvpgames.text)
 
     return_response_pvp_games = []
 
     for game in data_pvpgames:
-        url_current_game = URL + url_services["pvp"] + url_services["games"] +\
+        url_current_game = URL + url_services["pvp"] + url_services["games"] + \
                            url_services["token"] + api + "&id=" + game
         req_current_game = requests.get(url_current_game)
         data_current_game = json.loads(req_current_game.text)
         url_map = URL + url_services["maps"] + str(data_current_game["map_id"])
         req_map = requests.get(url_map)
         data_map = json.loads(req_map.text)
-
 
         return_response_pvp_games.append((data_map["name"].encode("utf-8"),
                                           data_current_game["result"].encode("utf-8"),
@@ -583,6 +579,8 @@ def getPvPGames(request):
         'pvp_games.html',
         {'games': return_response_pvp_games},
         context)
+
+
 @csrf_exempt
 @login_required
 def createCharacter(request):
@@ -592,14 +590,13 @@ def createCharacter(request):
 
         if CreateCharacterForm.is_valid():
             character = Character(name=CreateCharacterForm.cleaned_data['name'],
-                                        race=CreateCharacterForm.cleaned_data['race'],
-                                        gender=CreateCharacterForm.cleaned_data['gender'],
-                                        level=CreateCharacterForm.cleaned_data['level'],
-                                        guild=CreateCharacterForm.cleaned_data['guild'],
-                                        profession_type=CreateCharacterForm.cleaned_data["profession_type"]
-                                   )
+                                  race=CreateCharacterForm.cleaned_data['race'],
+                                  gender=CreateCharacterForm.cleaned_data['gender'],
+                                  level=CreateCharacterForm.cleaned_data['level'],
+                                  guild=CreateCharacterForm.cleaned_data['guild'],
+                                  profession_type=CreateCharacterForm.cleaned_data["profession_type"]
+                                  )
             character.save()
-
 
             return HttpResponseRedirect('/characters/create/created')
 
@@ -611,10 +608,12 @@ def createCharacter(request):
 
     return render_to_response("createcharacter.html", {'CreateCharacterForm': CreateCharacterForm}, context)
 
+
 @csrf_exempt
 def characterCreated(request):
     context = RequestContext(request)
     return render_to_response("charactercreated.html", {}, context)
+
 
 @login_required
 def list_characters(request):
@@ -623,7 +622,8 @@ def list_characters(request):
     for i in Character.objects.all():
         l.append(i)
     l.reverse()
-    return render_to_response("characters_list.html", {'list': l},context)
+    return render_to_response("characters_list.html", {'list': l}, context)
+
 
 @csrf_exempt
 @login_required
@@ -636,7 +636,7 @@ def edit_characters(request):
             EditCharacterForm = forms.EditCharacterForm(data=request.POST)
 
             if EditCharacterForm.is_valid():
-                new_character=Character(
+                new_character = Character(
                     name=EditCharacterForm.cleaned_data['name'],
                     race=EditCharacterForm.cleaned_data['race'],
                     gender=EditCharacterForm.cleaned_data['gender'],
@@ -647,22 +647,63 @@ def edit_characters(request):
                 new_character.save()
                 return HttpResponseRedirect("/characters/list")
     else:
-        EditCharacterForm=forms.EditCharacterForm()
+        EditCharacterForm = forms.EditCharacterForm()
 
     return render_to_response("edit_characters.html", {'EditCharacterForm': EditCharacterForm}, context)
+
 
 @csrf_exempt
 @login_required
 def delete_characters(request):
-
-
     if Character.objects.filter(name=request.GET.get('name')).exists():
         Character.objects.get(name=request.GET.get('name')).delete()
 
         return HttpResponseRedirect("/characters/list")
 
 
+@csrf_exempt
+@login_required
+def create_build(request):
+    context = RequestContext(request)
+    if request.method == "POST":
+        CreateBuildForm = forms.CreateBuildForm(data=request.POST)
+    else:
+        CreateBuildForm = forms.CreateBuildForm()
+
+    return render_to_response("edit_characters.html", {'form': CreateBuildForm}, context)
 
 
+class APIWeaponList(generics.ListCreateAPIView):
+    model = Weapon
+    queryset = Weapon.objects.all()
+    serializer_class = WeaponSerializer
 
 
+class APIWeaponDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = Weapon
+    queryset = Weapon.objects.all()
+    serializer_class = WeaponSerializer
+
+
+class APIProfessionBuildList(generics.ListCreateAPIView):
+    model = ProfessionBuild
+    queryset = ProfessionBuild.objects.all()
+    serializer_class = ProfessionSerializer
+
+
+class APIProfessionBuildDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = ProfessionBuild
+    queryset = ProfessionBuild.objects.all()
+    serializer_class = ProfessionSerializer
+
+
+class APIWeaponSkillList(generics.ListCreateAPIView):
+    model = WeaponSkill
+    queryset = WeaponSkill.objects.all()
+    serializer_class = WeaponSkillSerializer
+
+
+class APIWeaponSkillList(generics.ListCreateAPIView):
+    model = WeaponSkill
+    queryset = WeaponSkill.objects.all()
+    serializer_class = WeaponSkillSerializer
