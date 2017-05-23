@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -19,13 +20,11 @@ class InstanceMixin(object):
 
 
 class PlayerProfile(models.Model):
-    user = models.OneToOneField(User, unique=True)
+    user = models.OneToOneField(User, unique=True, related_name='playerprofile')
     apikey = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
         return self.user.username
-
-
 
 
 class Character(models.Model):
@@ -49,6 +48,7 @@ class Character(models.Model):
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])
     guild = models.CharField(max_length=50, blank=True)
     PROFESSIONS = (
+        ('Thief', 'Thief'),
         ('Guardian', 'Guardian'),
         ('Mesmer', 'Mesmer'),
         ('Warrior', 'Warrior'),
@@ -57,7 +57,6 @@ class Character(models.Model):
         ('Ranger', 'Ranger'),
         ('Engineer', 'Engineer'),
         ('Elementalist', 'Elementalist'),
-        ('Thief', 'Thief'),
     )
 
     profession_type = models.CharField(max_length=20, choices=PROFESSIONS, null=True)

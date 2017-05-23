@@ -11,13 +11,13 @@
 <p>User: {{ user.username }} |
 <a href="{% url 'logout' %}?next={{request.path}}">Logout</a></p>
 {% else %}
-<p><a href="{% url 'register' %}?next={{request.path}}">Register</a></p>
+<p><a href="{% url 'gw2_app:register' %}?next={{request.path}}">Register</a></p>
 <p><a href="{% url 'login' %}?next={{request.path}}">Login</a></p>
         {% endif %}
     {% endblock %}
 </div>
 <div id="sidebar">
-{% block sidebar %}<ul><li><a href="/">Home</a></li></ul>{% endblock %} </div>
+{% block sidebar %}<ul><li><a href="/gw2_app">Home</a></li></ul>{% endblock %} </div>
 {% block content %}
 {% endblock %}
 <div id="footer">{% block footer %}{% endblock %}</div> </body>

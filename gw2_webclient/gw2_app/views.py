@@ -11,14 +11,18 @@ from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
 
-from forms import UserForm, CreateCharacterForm, EditCharacterForm
+from forms import UserForm
 from models import PlayerProfile,Character
 from django.http import HttpResponseRedirect
-from django.utils import timezone
 
 from . import forms
+
+from serializers import CharacterSerializer
+from rest_framework import generics, permissions
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 URL = "https://api.guildwars2.com/v2/"
 url_services = {
@@ -596,12 +600,14 @@ def createCharacter(request):
                                         gender=CreateCharacterForm.cleaned_data['gender'],
                                         level=CreateCharacterForm.cleaned_data['level'],
                                         guild=CreateCharacterForm.cleaned_data['guild'],
-                                        profession_type=CreateCharacterForm.cleaned_data["profession_type"]
+                                        profession_type=CreateCharacterForm.cleaned_data['profession_type']
                                    )
+            player=request.user.playerprofile
+            character.player = player
             character.save()
 
 
-            return HttpResponseRedirect('/characters/create/created')
+            return HttpResponseRedirect('/gw2_app/characters/create/created')
 
         else:
             print(CreateCharacterForm.errors)
@@ -635,7 +641,7 @@ def edit_characters(request,id):
         if CreateCharacterForm.is_valid():
             char_form = forms.CreateCharacterForm(request.POST, instance=char)
             char_form.save()
-            return HttpResponseRedirect('/characters/list')
+            return HttpResponseRedirect('/gw2_app/characters/list')
         else:
             char = Character.objects.get(name=id)
             CreateCharacterForm = forms.CreateCharacterForm(instance=char)
@@ -652,10 +658,29 @@ def delete_characters(request):
     if Character.objects.filter(name=request.GET.get('name')).exists():
         Character.objects.get(name=request.GET.get('name')).delete()
 
-        return HttpResponseRedirect("/characters/list")
+        return HttpResponseRedirect("/gw2_app/characters/list")
+
+#API
+
+class IsOwnerOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj.player.user == request.user
 
 
+class APICharacterList(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Character
+    queryset = Character.objects.all()
+    serializer_class = CharacterSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(player = self.request.user.playerprofile)
 
 
-
-
+class APICharacterDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsOwnerOrReadOnly,)
+    model = Character
+    queryset = Character.objects.all()
+    serializer_class = CharacterSerializer
