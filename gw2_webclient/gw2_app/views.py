@@ -613,7 +613,7 @@ def createCharacter(request):
             character.save()
 
 
-            return HttpResponseRedirect('/gw2_app/characters/create/created')
+            return HttpResponseRedirect('/characters/create/created')
 
         else:
             print(CreateCharacterForm.errors)
@@ -647,7 +647,7 @@ def edit_characters(request,id):
         if CreateCharacterForm.is_valid():
             char_form = forms.CreateCharacterForm(request.POST, instance=char)
             char_form.save()
-            return HttpResponseRedirect('/gw2_app/characters/list')
+            return HttpResponseRedirect('/characters/list')
         else:
             char = Character.objects.get(name=id)
             CreateCharacterForm = forms.CreateCharacterForm(instance=char)
@@ -664,7 +664,7 @@ def delete_characters(request):
     if Character.objects.filter(name=request.GET.get('name')).exists():
         Character.objects.get(name=request.GET.get('name')).delete()
 
-        return HttpResponseRedirect("/gw2_app/characters/list")
+        return HttpResponseRedirect("/characters/list")
 
 #API
 
