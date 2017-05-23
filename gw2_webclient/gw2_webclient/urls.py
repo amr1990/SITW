@@ -16,15 +16,19 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
-
 from gw2_app import views
 import gw2_app
+
+from django.conf.urls import url
+from gw2_app import views
 
 urlpatterns = [
     url(r'^$', views.homepage, name='homepage'),
     url(r'^api/', include('gw2_app.urls')),
     url(r'^accounts/login/$', login, name='login'),
     url(r'^accounts/logout/$', logout, name='logout'),
+    url(r'^accounts/profile/$', views.homepage, name='homepage'),
+    url(r'^admin/', admin.site.urls),
     url(r'^registration/register/$', views.register, name='register'),
     url(r'^characters/$', views.getCharacterList, name='characters'),
     url(r'^characters/info/$', views.getCharacterInfo, name='characterinfo'),
@@ -33,6 +37,7 @@ urlpatterns = [
     url(r'^characters/create/created$', views.characterCreated, name='character_created'),
     url(r'^characters/list/$', views.list_characters, name='characters_list'),
     url(r'^characters/edit/$', views.create_build, name='edit_characters'),
+    url(r'^characters/(?P<id>.*)/edit/$', views.edit_characters, name='edit_characters'),
     url(r'^characters/delete/$', views.delete_characters, name='delete_characters'),
     url(r'^characters/inventory/$', views.getInventory, name='inventory'),
     url(r'^characters/gear/$', views.getGear, name='gear'),
@@ -49,5 +54,7 @@ urlpatterns = [
     url(r'^pvp/$', views.pvp, name='pvp'),
     url(r'^pvp/stats/$', views.getPvPStats, name='pvp_stats'),
     url(r'^pvp/games/$', views.getPvPGames, name='pvp_games'),
-    url(r'^admin/', admin.site.urls),
+    url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/', include('gw2_app.urls')),
 ]
+

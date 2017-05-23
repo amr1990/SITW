@@ -10,6 +10,10 @@ urlpatterns = [
     url(r'^professions/(?P<pk>\d+)/$', APIProfessionBuildDetail.as_view(), name='profession-detail'),
     url(r'^wskills/$', APIWeaponSkillList.as_view(), name='weaponskill-list'),
     url(r'^wskills/(?P<pk>\d+)/$', APIWeaponSkillList.as_view(), name='weaponskill-detail'),
+    url(r'^character/$', APICharacterList.as_view(), name='character-list'),
+    url(r'^character/(?P<pk>\d+)/$', APICharacterDetail.as_view(), name='character-detail'),
+
+
 ]
 
 # Format suffixes

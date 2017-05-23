@@ -17,9 +17,13 @@ class InstanceMixin(object):
             raise ValidationError("Can only create 9 %s instance" % model.__name__)
         super(InstanceMixin, self).clean()
 
+class Profile(models.Model):
+    city = models.CharField(max_length=100)
+    country = models.CharField(max_length=100,null=True)
+    user = models.OneToOneField(User,unique=True)
 
 class PlayerProfile(models.Model):
-    user = models.OneToOneField(User, unique=True)
+    user = models.OneToOneField(User, unique=True, related_name='playerprofile')
     apikey = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
@@ -100,6 +104,19 @@ class Trait(models.Model):
 
 
 class Character(InstanceMixin, models.Model):
+class Character(models.Model):
+    RACE = (
+        ('Norn', 'Norn'),
+        ('Asura', 'Asura'),
+        ('Sylvary', 'Sylvary'),
+        ('Charr', 'Charr'),
+        ('Human', 'Human'),
+    )
+    GENDER = (
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    )
+
     date = models.DateTimeField(null=True)
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=20, null=False, unique=True)
@@ -107,8 +124,22 @@ class Character(InstanceMixin, models.Model):
     gender = models.CharField(max_length=10)
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])
     guild = models.CharField(max_length=50, blank=True)
+    PROFESSIONS = (
+        ('Thief', 'Thief'),
+        ('Guardian', 'Guardian'),
+        ('Mesmer', 'Mesmer'),
+        ('Warrior', 'Warrior'),
+        ('Necromancer', 'Necromancer'),
+        ('Revenant', 'Revenant'),
+        ('Ranger', 'Ranger'),
+        ('Engineer', 'Engineer'),
+        ('Elementalist', 'Elementalist'),
+    )
 
     profession_type = models.CharField(max_length=20, null=True)
+
+    def get_absolute_url(self):
+        return reverse('edit_char', kwargs={'char_id': self.id})
 
     def __unicode__(self):
         return self.name

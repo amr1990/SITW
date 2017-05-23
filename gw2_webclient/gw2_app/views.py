@@ -1,6 +1,9 @@
 # encoding=utf8
 import json
 import string
+
+
+import requests
 import urllib2
 
 import bs4
@@ -8,6 +11,8 @@ import requests
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
+from django.contrib.auth.models import User
+from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
@@ -15,7 +20,17 @@ from rest_framework import generics
 from forms import UserForm
 from models import *
 from serializers import WeaponSerializer, ProfessionSerializer, WeaponSkillSerializer
+from forms import UserForm, CreateCharacterForm, ProfileForm
+from models import PlayerProfile,Character
+from django.http import HttpResponseRedirect
+
 from . import forms
+
+from serializers import CharacterSerializer
+from rest_framework import generics, permissions
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 URL = "https://api.guildwars2.com/v2/"
 url_services = {
@@ -62,17 +77,21 @@ def register(request):
         # Attempt to grab information from the raw form information.
         # Note that we make use of both UserForm and UserProfileForm.
         user_form = UserForm(data=request.POST)
-
+        profile_form=ProfileForm(data=request.POST)
         # If the two forms are valid...
-        if user_form.is_valid():
+        if user_form.is_valid() and profile_form.is_valid():
             # Save the user's form data to the database.
             user = user_form.save()
+
 
             # Now we hash the password with the set_password method.
             # Once hashed, we can update the user object.
             user.set_password(user.password)
             user.save()
 
+            profile=profile_form.save(commit=False)
+            profile.user=user
+            profile.save()
             # Update our variable to tell the template registration was successful.
             registered = True
 
@@ -86,11 +105,12 @@ def register(request):
     # These forms will be blank, ready for user input.
     else:
         user_form = UserForm()
+        profile_form=ProfileForm()
 
     # Render the template depending on the context.
     return render_to_response(
         'registration/register.html',
-        {'user_form': user_form, 'registered': registered},
+        {'user_form': user_form, 'profile_form':profile_form,'registered': registered},
         context)
 
 
@@ -596,6 +616,8 @@ def createCharacter(request):
                                   guild=CreateCharacterForm.cleaned_data['guild'],
                                   profession_type=CreateCharacterForm.cleaned_data["profession_type"]
                                   )
+            player=request.user.playerprofile
+            character.player = player
             character.save()
 
             return HttpResponseRedirect('/characters/create/created')
@@ -627,14 +649,18 @@ def list_characters(request):
 
 @csrf_exempt
 @login_required
-def edit_characters(request):
-    context = RequestContext(request)
+def edit_characters(request,id):
+    char = Character.objects.get(name=id)
+    if request.method == "POST":
+        CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
 
-    if Character.objects.filter(name=request.GET.get('name')).exists():
-        Character.objects.get(name=request.GET.get('name')).delete()
-        if request.method == "POST":
-            EditCharacterForm = forms.EditCharacterForm(data=request.POST)
-
+        if CreateCharacterForm.is_valid():
+            char_form = forms.CreateCharacterForm(request.POST, instance=char)
+            char_form.save()
+            return HttpResponseRedirect('/characters/list')
+        else:
+            char = Character.objects.get(name=id)
+            CreateCharacterForm = forms.CreateCharacterForm(instance=char)
             if EditCharacterForm.is_valid():
                 new_character = Character(
                     name=EditCharacterForm.cleaned_data['name'],
@@ -647,10 +673,10 @@ def edit_characters(request):
                 new_character.save()
                 return HttpResponseRedirect("/characters/list")
     else:
+        CreateCharacterForm = forms.CreateCharacterForm(instance=char)
         EditCharacterForm = forms.EditCharacterForm()
 
-    return render_to_response("edit_characters.html", {'EditCharacterForm': EditCharacterForm}, context)
-
+    return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
 
 @csrf_exempt
 @login_required
@@ -660,7 +686,13 @@ def delete_characters(request):
 
         return HttpResponseRedirect("/characters/list")
 
+#API
 
+class IsOwnerOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj.player.user == request.user
 @csrf_exempt
 @login_required
 def create_build(request):
@@ -672,11 +704,18 @@ def create_build(request):
 
     return render_to_response("edit_characters.html", {'form': CreateBuildForm}, context)
 
+class APICharacterList(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    model = Character
+    queryset = Character.objects.all()
+    serializer_class = CharacterSerializer
 
 class APIWeaponList(generics.ListCreateAPIView):
     model = Weapon
     queryset = Weapon.objects.all()
     serializer_class = WeaponSerializer
+    def perform_create(self, serializer):
+        serializer.save(player = self.request.user.playerprofile)
 
 
 class APIWeaponDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -707,3 +746,9 @@ class APIWeaponSkillList(generics.ListCreateAPIView):
     model = WeaponSkill
     queryset = WeaponSkill.objects.all()
     serializer_class = WeaponSkillSerializer
+
+class APICharacterDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsOwnerOrReadOnly,)
+    model = Character
+    queryset = Character.objects.all()
+    serializer_class = CharacterSerializer

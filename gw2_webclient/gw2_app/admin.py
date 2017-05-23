@@ -1,9 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from models import PlayerProfile, Character, Profession, GeneralAchievement, DailyAchievement, PveEvent, \
-    PvePersonalStory, StructuredPvpStat, WvwStat, ProfessionBuild, Weapon, WeaponSkill, Trait, ProfessionSkill, \
-    Specialization
+from models import PlayerProfile, Character, GeneralAchievement, DailyAchievement, PveEvent, \
+    PvePersonalStory, StructuredPvpStat, WvwStat, Profile
 
 admin.site.register(PlayerProfile)
 admin.site.register(Character)
@@ -20,6 +19,7 @@ admin.site.register(WeaponSkill)
 admin.site.register(Trait)
 admin.site.register(ProfessionSkill)
 admin.site.register(Specialization)
+admin.site.register(Profile)
 
 
 class InstanceAdminMixin(object):
