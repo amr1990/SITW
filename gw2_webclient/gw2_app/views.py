@@ -11,8 +11,9 @@ from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
-from forms import UserForm
+from forms import UserForm, CreateCharacterForm, ProfileForm
 from models import PlayerProfile,Character
 from django.http import HttpResponseRedirect
 
@@ -69,17 +70,21 @@ def register(request):
         # Attempt to grab information from the raw form information.
         # Note that we make use of both UserForm and UserProfileForm.
         user_form = UserForm(data=request.POST)
-
+        profile_form=ProfileForm(data=request.POST)
         # If the two forms are valid...
-        if user_form.is_valid():
+        if user_form.is_valid() and profile_form.is_valid():
             # Save the user's form data to the database.
             user = user_form.save()
+
 
             # Now we hash the password with the set_password method.
             # Once hashed, we can update the user object.
             user.set_password(user.password)
             user.save()
 
+            profile=profile_form.save(commit=False)
+            profile.user=user
+            profile.save()
             # Update our variable to tell the template registration was successful.
             registered = True
 
@@ -93,11 +98,12 @@ def register(request):
     # These forms will be blank, ready for user input.
     else:
         user_form = UserForm()
+        profile_form=ProfileForm()
 
     # Render the template depending on the context.
     return render_to_response(
         'registration/register.html',
-        {'user_form': user_form, 'registered': registered},
+        {'user_form': user_form, 'profile_form':profile_form,'registered': registered},
         context)
 
 
@@ -634,10 +640,10 @@ def list_characters(request):
 @csrf_exempt
 @login_required
 def edit_characters(request,id):
-
+    char = Character.objects.get(name=id)
     if request.method == "POST":
         CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
-        char = Character.objects.get(name=id)
+
         if CreateCharacterForm.is_valid():
             char_form = forms.CreateCharacterForm(request.POST, instance=char)
             char_form.save()
@@ -646,7 +652,7 @@ def edit_characters(request,id):
             char = Character.objects.get(name=id)
             CreateCharacterForm = forms.CreateCharacterForm(instance=char)
     else:
-        CreateCharacterForm = forms.CreateCharacterForm()
+        CreateCharacterForm = forms.CreateCharacterForm(instance=char)
 
     return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
 

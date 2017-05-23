@@ -18,6 +18,10 @@ class InstanceMixin(object):
             raise ValidationError("Can only create 9 %s instance" % model.__name__)
         super(InstanceMixin, self).clean()
 
+class Profile(models.Model):
+    city = models.CharField(max_length=100)
+    country = models.CharField(max_length=100,null=True)
+    user = models.OneToOneField(User,unique=True)
 
 class PlayerProfile(models.Model):
     user = models.OneToOneField(User, unique=True, related_name='playerprofile')
