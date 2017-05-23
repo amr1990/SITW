@@ -1,6 +1,8 @@
 from rest_framework import serializers
+from rest_framework.fields import CharField
 from rest_framework.relations import HyperlinkedIdentityField
 
+from models import Character, Trait, Specialization
 from models import Weapon, ProfessionBuild, WeaponSkill
 
 
@@ -14,11 +16,10 @@ class WeaponSerializer(serializers.ModelSerializer):
 
 class ProfessionSerializer(serializers.ModelSerializer):
     uri = HyperlinkedIdentityField(view_name='profession-detail')
-    weapons = WeaponSerializer(read_only=True, many=True)
 
     class Meta:
         model = ProfessionBuild
-        fields = ('uri', 'name', 'weapons')
+        fields = ('uri', 'name')
 
 
 class WeaponSkillSerializer(serializers.ModelSerializer):
@@ -28,10 +29,6 @@ class WeaponSkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeaponSkill
         fields = ('uri', 'name', 'description', 'weapon')
-from rest_framework.relations import HyperlinkedIdentityField
-from rest_framework import serializers
-from models import Character
-from rest_framework.fields import CharField
 
 
 class CharacterSerializer(serializers.HyperlinkedModelSerializer):
@@ -41,3 +38,19 @@ class CharacterSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Character
         fields = ('uri', 'player', 'name', 'race', 'gender', 'level', 'guild', 'profession_type')
+
+
+class TraitSerializer(serializers.ModelSerializer):
+    uri = HyperlinkedIdentityField(view_name='trait-detail')
+
+    class Meta:
+        model = Trait
+        fields = ('uri', 'name', 'description', 'ismajor')
+
+
+class SpecSerializer(serializers.ModelSerializer):
+    uri = HyperlinkedIdentityField(view_name='spec-detail')
+
+    class Meta:
+        model = Specialization
+        fields = ('uri', 'name', 'iselite')

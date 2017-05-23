@@ -1,36 +1,22 @@
 # encoding=utf8
 import json
 import string
-
-
-import requests
 import urllib2
 
 import bs4
 import requests
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import generics
-
-from forms import UserForm
-from models import *
-from serializers import WeaponSerializer, ProfessionSerializer, WeaponSkillSerializer
-from forms import UserForm, CreateCharacterForm, ProfileForm
-from models import PlayerProfile,Character
-from django.http import HttpResponseRedirect
-
-from . import forms
-
-from serializers import CharacterSerializer
 from rest_framework import generics, permissions
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+from forms import UserForm, ProfileForm
+from models import *
+from models import PlayerProfile
+from serializers import *
+from . import forms
 
 URL = "https://api.guildwars2.com/v2/"
 url_services = {
@@ -649,7 +635,7 @@ def list_characters(request):
 
 @csrf_exempt
 @login_required
-def edit_characters(request,id):
+def edit_characters(request, id):
     char = Character.objects.get(name=id)
     if request.method == "POST":
         CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
@@ -661,20 +647,19 @@ def edit_characters(request,id):
         else:
             char = Character.objects.get(name=id)
             CreateCharacterForm = forms.CreateCharacterForm(instance=char)
-            if EditCharacterForm.is_valid():
+            if CreateCharacterForm.is_valid():
                 new_character = Character(
-                    name=EditCharacterForm.cleaned_data['name'],
-                    race=EditCharacterForm.cleaned_data['race'],
-                    gender=EditCharacterForm.cleaned_data['gender'],
-                    level=EditCharacterForm.cleaned_data['level'],
-                    guild=EditCharacterForm.cleaned_data['guild'],
-                    profession_type=EditCharacterForm.cleaned_data["profession_type"]
+                    name=CreateCharacterForm.cleaned_data['name'],
+                    race=CreateCharacterForm.cleaned_data['race'],
+                    gender=CreateCharacterForm.cleaned_data['gender'],
+                    level=CreateCharacterForm.cleaned_data['level'],
+                    guild=CreateCharacterForm.cleaned_data['guild'],
+                    profession_type=CreateCharacterForm.cleaned_data["profession_type"]
                 )
                 new_character.save()
                 return HttpResponseRedirect("/characters/list")
     else:
         CreateCharacterForm = forms.CreateCharacterForm(instance=char)
-        EditCharacterForm = forms.EditCharacterForm()
 
     return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
 
@@ -686,7 +671,6 @@ def delete_characters(request):
 
         return HttpResponseRedirect("/characters/list")
 
-#API
 
 class IsOwnerOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
     def has_object_permission(self, request, view, obj):
@@ -704,18 +688,21 @@ def create_build(request):
 
     return render_to_response("edit_characters.html", {'form': CreateBuildForm}, context)
 
+
 class APICharacterList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     model = Character
     queryset = Character.objects.all()
     serializer_class = CharacterSerializer
 
+
 class APIWeaponList(generics.ListCreateAPIView):
     model = Weapon
     queryset = Weapon.objects.all()
     serializer_class = WeaponSerializer
+
     def perform_create(self, serializer):
-        serializer.save(player = self.request.user.playerprofile)
+        serializer.save(player=self.request.user.playerprofile)
 
 
 class APIWeaponDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -742,13 +729,32 @@ class APIWeaponSkillList(generics.ListCreateAPIView):
     serializer_class = WeaponSkillSerializer
 
 
-class APIWeaponSkillList(generics.ListCreateAPIView):
-    model = WeaponSkill
-    queryset = WeaponSkill.objects.all()
-    serializer_class = WeaponSkillSerializer
-
 class APICharacterDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsOwnerOrReadOnly,)
     model = Character
     queryset = Character.objects.all()
     serializer_class = CharacterSerializer
+
+
+class APITraitsDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = Trait
+    queryset = Trait.objects.all()
+    serializer_class = TraitSerializer
+
+
+class APITraitsList(generics.ListCreateAPIView):
+    model = Trait
+    queryset = Trait.objects.all()
+    serializer_class = TraitSerializer
+
+
+class APISpecDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = Specialization
+    queryset = Specialization.objects.all()
+    serializer_class = SpecSerializer
+
+
+class APISpecList(generics.ListCreateAPIView):
+    model = Specialization
+    queryset = Specialization.objects.all()
+    serializer_class = SpecSerializer

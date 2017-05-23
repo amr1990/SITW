@@ -1,7 +1,8 @@
-from django.conf.urls import url, include
-from views import APIWeaponList, APIWeaponDetail, APIProfessionBuildList, APIProfessionBuildDetail, APIWeaponSkillList
+from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 
+from views import APICharacterList, APICharacterDetail, APIWeaponList, APIWeaponDetail, APIProfessionBuildList, \
+    APIProfessionBuildDetail, APIWeaponSkillList, APITraitsDetail, APITraitsList, APISpecList, APISpecDetail
 
 urlpatterns = [
     url(r'^weapons/$', APIWeaponList.as_view(), name='weapon-list'),
@@ -12,8 +13,10 @@ urlpatterns = [
     url(r'^wskills/(?P<pk>\d+)/$', APIWeaponSkillList.as_view(), name='weaponskill-detail'),
     url(r'^character/$', APICharacterList.as_view(), name='character-list'),
     url(r'^character/(?P<pk>\d+)/$', APICharacterDetail.as_view(), name='character-detail'),
-
-
+    url(r'^traits/$', APITraitsList.as_view(), name='trait-list'),
+    url(r'^traits/(?P<pk>\d+)/$', APITraitsDetail.as_view(), name='trait-detail'),
+    url(r'^specializations/$', APISpecList.as_view(), name='spec-list'),
+    url(r'^specializations/(?P<pk>\d+)/$', APISpecDetail.as_view(), name='spec-detail'),
 ]
 
 # Format suffixes

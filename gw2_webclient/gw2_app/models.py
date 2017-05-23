@@ -7,6 +7,8 @@ from django.db import models
 
 
 # Create your models here.
+from django.urls import reverse
+
 
 class InstanceMixin(object):
     """Makes sure that no more than nine instance of a given model is created."""
@@ -17,10 +19,12 @@ class InstanceMixin(object):
             raise ValidationError("Can only create 9 %s instance" % model.__name__)
         super(InstanceMixin, self).clean()
 
+
 class Profile(models.Model):
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100,null=True)
     user = models.OneToOneField(User,unique=True)
+
 
 class PlayerProfile(models.Model):
     user = models.OneToOneField(User, unique=True, related_name='playerprofile')
@@ -49,7 +53,6 @@ class ProfessionBuild(models.Model):
 
 class Weapon(models.Model):
     name = models.CharField(max_length=30, null=True)
-    #build = models.ForeignKey('Build', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return str(self.weapontype)
@@ -77,7 +80,6 @@ class WeaponSkill(models.Model):
     description = models.TextField()
     weapon = models.ForeignKey('Weapon', on_delete=models.CASCADE, null=True)
     profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
-    #build = models.ForeignKey('Build', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return str(self.name)
@@ -103,7 +105,6 @@ class Trait(models.Model):
         return str(self.name)
 
 
-class Character(InstanceMixin, models.Model):
 class Character(models.Model):
     RACE = (
         ('Norn', 'Norn'),
