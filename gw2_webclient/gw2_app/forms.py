@@ -1,16 +1,22 @@
 from django.contrib.auth.models import User
 from django import forms
 
-from models import PlayerProfile, Character
+from models import PlayerProfile, Character, Profile
 
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
 
+
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = ('username','email', 'password')
 
+class ProfileForm(forms.ModelForm):
+
+    class Meta:
+        model=Profile
+        fields=('city',)
 
 class PlayerForm(forms.ModelForm):
     class Meta:
@@ -22,9 +28,5 @@ class CreateCharacterForm(forms.ModelForm):
         model = Character
         fields = ('name','race','gender','level','guild', 'profession_type')
 
-class EditCharacterForm(forms.ModelForm):
-        class Meta:
-            model = Character
-            fields = ('name', 'race', 'gender', 'level', 'guild', 'profession_type')
 
 

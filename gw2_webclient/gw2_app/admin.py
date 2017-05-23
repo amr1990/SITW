@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from models import PlayerProfile, Character, GeneralAchievement, DailyAchievement, PveEvent, \
-    PvePersonalStory, StructuredPvpStat, WvwStat
+    PvePersonalStory, StructuredPvpStat, WvwStat, Profile
 
 admin.site.register(PlayerProfile)
 admin.site.register(Character)
@@ -12,6 +12,7 @@ admin.site.register(PveEvent)
 admin.site.register(PvePersonalStory)
 admin.site.register(StructuredPvpStat)
 admin.site.register(WvwStat)
+admin.site.register(Profile)
 
 
 class InstanceAdminMixin(object):
