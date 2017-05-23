@@ -16,7 +16,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model=Profile
-        fields=('city',)
+        fields=('city','country')
 
 class PlayerForm(forms.ModelForm):
     class Meta:

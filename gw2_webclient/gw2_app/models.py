@@ -19,7 +19,7 @@ class InstanceMixin(object):
 
 class Profile(models.Model):
     city = models.CharField(max_length=100)
-
+    country = models.CharField(max_length=100,null=True)
     user = models.OneToOneField(User,unique=True)
 
 class PlayerProfile(models.Model):
