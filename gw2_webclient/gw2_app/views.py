@@ -701,9 +701,6 @@ class APIWeaponList(generics.ListCreateAPIView):
     queryset = Weapon.objects.all()
     serializer_class = WeaponSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(player=self.request.user.playerprofile)
-
 
 class APIWeaponDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Weapon
@@ -734,6 +731,9 @@ class APICharacterDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Character
     queryset = Character.objects.all()
     serializer_class = CharacterSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(player=self.request.user.playerprofile)
 
 
 class APITraitsDetail(generics.RetrieveUpdateDestroyAPIView):

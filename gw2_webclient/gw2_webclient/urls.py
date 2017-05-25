@@ -24,7 +24,6 @@ from gw2_app import views
 
 urlpatterns = [
     url(r'^$', views.homepage, name='homepage'),
-    url(r'^api/', include('gw2_app.urls')),
     url(r'^accounts/login/$', login, name='login'),
     url(r'^accounts/logout/$', logout, name='logout'),
     url(r'^accounts/profile/$', views.homepage, name='homepage'),

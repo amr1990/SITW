@@ -1,12 +1,10 @@
 from django.contrib import admin
 
 # Register your models here.
-from models import PlayerProfile, Character, GeneralAchievement, DailyAchievement, PveEvent, \
-    PvePersonalStory, StructuredPvpStat, WvwStat, Profile
+from models import *
 
 admin.site.register(PlayerProfile)
 admin.site.register(Character)
-admin.site.register(Profession)
 admin.site.register(GeneralAchievement)
 admin.site.register(DailyAchievement)
 admin.site.register(PveEvent)
