@@ -12,6 +12,7 @@ admin.site.register(Specialization)
 admin.site.register(Profile)
 admin.site.register(WeaponSet)
 admin.site.register(Build)
+admin.site.register(Character)
 
 
 class InstanceAdminMixin(object):

@@ -23,7 +23,7 @@ class InstanceMixin(object):
 class Profile(models.Model):
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100,null=True)
-    user = models.OneToOneField(User,unique=True)
+    user = models.OneToOneField(User, unique=True, related_name='profile')
     apikey = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
@@ -116,8 +116,8 @@ class Character(models.Model):
 
     player = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=20, null=False, unique=True)
-    race = models.CharField(max_length=10)
-    gender = models.CharField(max_length=10)
+    race = models.CharField(max_length=10, choices=RACE)
+    gender = models.CharField(max_length=10, choices=GENDER)
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])
     guild = models.CharField(max_length=50, blank=True)
     PROFESSIONS = (
@@ -132,7 +132,7 @@ class Character(models.Model):
         ('Elementalist', 'Elementalist'),
     )
 
-    profession_type = models.CharField(max_length=20, null=True)
+    profession_type = models.CharField(max_length=20, null=True, choices=PROFESSIONS)
 
     def get_absolute_url(self):
         return reverse('edit_char', kwargs={'char_id': self.id})

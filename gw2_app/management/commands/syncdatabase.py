@@ -48,11 +48,11 @@ class Command(BaseCommand):
         prof_data =json.loads(prof_req.text)
         skills_data = json.loads(skills_req.text)
 
-        self.getProfession(url_professions, prof_data)
-        self.getWeapons(url_professions, prof_data)
-        self.getWeaponSkills(url_professions, url_skills, prof_data)
-        self.getProfessionSkills(url_professions, url_skills, prof_data)
-        self.getSpecs(url_professions, prof_data)
+        #self.getProfession(url_professions, prof_data)
+        #self.getWeapons(url_professions, prof_data)
+        #self.getWeaponSkills(url_professions, url_skills, prof_data)
+        #self.getProfessionSkills(url_professions, url_skills, prof_data)
+        #self.getSpecs(url_professions, prof_data)
         self.getTraits(url_professions, prof_data)
 
     def getProfession(self, url_professions, prof_data):
@@ -64,10 +64,10 @@ class Command(BaseCommand):
             data_prof = json.loads(req_prof.text)
             weapons = data_prof["weapons"].keys()
             for weapon in weapons:
-                wep = models.Weapon(weapontype=weapon)
+                wep = models.Weapon(name=weapon)
                 if models.Weapon.objects.count() == 0:
                     wep.save()
-                if models.Weapon.objects.filter(weapontype=weapon):
+                if models.Weapon.objects.filter(name=weapon):
                     pass
                 else:
                     wep.save()
@@ -85,8 +85,6 @@ class Command(BaseCommand):
 
             weapons = data_prof["weapons"].keys()
             p = models.ProfessionBuild(name=data_prof["name"])
-            if models.ProfessionBuild.objects.count() == 0:
-                wep.save()
             for e in models.ProfessionBuild.objects.all():
                 if e.name == p.name:
                     repeatdos = True
@@ -95,7 +93,7 @@ class Command(BaseCommand):
                 break
             p.save()
             for weapon in weapons:
-                wep = models.Weapon.objects.filter(weapontype=weapon).get()
+                wep = models.Weapon.objects.filter(name=weapon).get()
                 w.append(wep)
             profe = models.ProfessionBuild.objects.filter(name=data_prof["name"]).get()
             profe.weapons.set(w)
@@ -123,7 +121,7 @@ class Command(BaseCommand):
                     skill_data = json.loads(skill_request.text)
 
                     prof = models.ProfessionBuild.objects.filter(name=profession).get()
-                    w = models.Weapon.objects.filter(weapontype=weapon).get()
+                    w = models.Weapon.objects.filter(name=weapon).get()
 
                     wskill = models.WeaponSkill(name=skill_data["name"], description=skill_data["description"],
                                                 weapon=w, profession=prof)

@@ -600,7 +600,7 @@ def createCharacter(request):
                                   guild=CreateCharacterForm.cleaned_data['guild'],
                                   profession_type=CreateCharacterForm.cleaned_data["profession_type"]
                                   )
-            player = request.user.playerprofile
+            player = request.user.profile
             character.player = player
             character.save()
 
@@ -684,6 +684,9 @@ class APICharacterList(generics.ListCreateAPIView):
     queryset = Character.objects.all()
     serializer_class = CharacterSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(player=self.request.user.profile)
+
 
 class APIWeaponList(generics.ListCreateAPIView):
     model = Weapon
@@ -720,9 +723,6 @@ class APICharacterDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Character
     queryset = Character.objects.all()
     serializer_class = CharacterSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(player=self.request.user.playerprofile)
 
 
 class APITraitsDetail(generics.RetrieveUpdateDestroyAPIView):
