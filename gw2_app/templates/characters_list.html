@@ -1,0 +1,34 @@
+{%extends "base.html" %}
+{% block content %}
+<div class="text-center">
+    <h1>Customized Characters</h1>
+</div>
+
+
+    <div class="indicences_table">
+      <table border="2px">
+            <tr>
+                <th >Name </th>
+                <th >Race </th>
+                <th >Gender </th>
+                <th >Level </th>
+                <th >Guild </th>
+                <th >Profession </th>
+            </tr>
+    {% for i in list %}
+            <tr>
+                <td>{{ i.name }}</td>
+                <td>{{ i.race }}</td>
+                <td>{{ i.gender }}</td>
+                <td>{{ i.level }}</td>
+                <td>{{ i.guild }}</td>
+                <td>{{ i.profession_type }}</td>
+                <td><a href="/characters/{{i.name}}/edit/"><strong>Edit</strong></a></td>
+                <td><a href="/characters/delete/?name={{i.name}}"><strong>Delete</strong></a></td>
+            </tr>
+    {% endfor %}
+
+        </table>
+    </div>
+
+{% endblock %}

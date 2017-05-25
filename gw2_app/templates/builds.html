@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center">
+    <h1><strong>Create your customized character</strong></h1>
+</div>
+
+<div>
+    <form id="CreateBuildForm" method="post" enctype="multipart/form-data">
+
+
+     {% csrf_token %}
+        <table>
+             {{ CreateBuildForm.as_table }}
+
+        </table>
+
+
+            <div class="button">
+                <button class="btn btn-default">Create</button>
+            </div>
+    </form>
+    <button class="btn btn-default"><a href="/builds/weaponsets">Create Weapon Set</a> </button>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<meta charset="UTF-8">
+<h1>Information for PvP stats:</h1>
+    <h2> Stats </h2>
+    <table border="1">
+        <tr>
+            <td><strong>Type</strong></td>
+            <td><strong>Wins</strong></td>
+            <td><strong>Losses</strong></td>
+        </tr>
+            <tr>
+                <td><strong>All</strong></td>
+                <td>{{ stats.0.0 }}</td>
+                <td>{{ stats.0.1 }}</td>
+            </tr>
+            <tr>
+                <td><strong>Unranked</strong></td>
+                <td>{{ stats.0.2 }}</td>
+                <td>{{ stats.0.3 }}</td>
+            </tr>
+            <tr>
+                <td><strong>Ranked</strong></td>
+                <td>{{ stats.0.4 }}</td>
+                <td>{{ stats.0.5 }}</td>
+            </tr>
+    </table>
+    <h2> Professions: </h2>
+    <table border="1">
+        <tr>
+            <td><strong>Profession</strong></td>
+            <td><strong>Wins</strong></td>
+            <td><strong>Losses</strong></td>
+        </tr>
+        {% for stat in professions %}
+            <tr>
+                <td>{{ stat.0 }}</td>
+                <td>{{ stat.1 }}</td>
+                <td>{{ stat.2 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h2> Seasons: </h2>
+    <table border="1">
+        <tr>
+            <td><strong>Name</strong></td>
+            <td><strong>Rating</strong></td>
+            <td><strong>Division</strong></td>
+            <td><strong>Tier</strong></td>
+        </tr>
+        {% for item in standings %}
+            <tr>
+                <td>{{ item.0 }}</td>
+                <td>{{ item.1.1 }}</td>
+                <td>{{ item.1.0 }}</td>
+                <td>{{ item.1.2 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

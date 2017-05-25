@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Training Information for {{prof}}</h1>
+    <!--{{trainings}}-->
+    {% for name, track in trainings %}
+        <h2>{{name}}</h2>
+        <table border="1">
+            <tr>
+                <td><strong>Name</strong></td>
+                <td><strong>Type</strong></td>
+                <td><strong>Description</strong></td>
+            </tr>
+            {% for name, disc, type in track %}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{type}}</td>
+                    <td>{{disc}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+{% endblock %}

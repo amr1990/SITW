@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<meta charset="UTF-8">
+<h1>Character Information</h1>
+<table border="1">
+    {% for item, info in charinfo %}
+        <tr>
+            <td>{{item}}</td>
+            <td>{{info}}</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}
