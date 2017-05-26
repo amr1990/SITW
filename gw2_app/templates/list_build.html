@@ -1,0 +1,32 @@
+{%extends "base.html" %}
+{% block content %}
+<div class="text-center">
+    <h1>Customized Builds</h1>
+</div>
+
+
+    <div class="indicences_table">
+      <table border="2px">
+            <tr>
+                <th >Name </th>
+                <th >Profession </th>
+                <th >Gender </th>
+                <th >Weaponset </th>
+                <th >Character </th>
+            </tr>
+    {% for i in list %}
+            <tr>
+                <td>{{ i.0 }}</td>
+                <td>{{ i.1 }}</td>
+                <td>{{ i.2 }}</td>
+                <td>{{ i.3 }}</td>
+                <td><a href="/builds/{{i.0}}/edit/"><strong>Edit</strong></a></td>
+                <td><a href="/builds/delete/?name={{i.0}}"><strong>Delete</strong></a></td>
+
+            </tr>
+    {% endfor %}
+
+        </table>
+    </div>
+
+{% endblock %}

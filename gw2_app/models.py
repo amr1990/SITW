@@ -23,7 +23,7 @@ class InstanceMixin(object):
 class Profile(models.Model):
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100,null=True)
-    user = models.OneToOneField(User,unique=True,related_name='profile')
+    user = models.OneToOneField(User, unique=True,related_name='profile')
     apikey = models.CharField(max_length=100, blank=True)
 
     def __unicode__(self):
@@ -58,17 +58,20 @@ class Build(models.Model):
     name = models.CharField(max_length=100, null=True, blank=False)
     profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
     weaponset = models.ManyToManyField('WeaponSet')
+    character = models.ForeignKey('Character', on_delete=models.CASCADE, null=True)
 
     def __unicode__(self):
         return str(self.name)
 
 
 class WeaponSet(models.Model):
-    name = models.CharField(max_length=50, null=True, unique=True)
     weapon1 = models.ManyToManyField('Weapon')
 
     def __unicode__(self):
-        return str(self.name)
+        a = "Weaponset: "
+        for b in self.weapon1.all():
+            a = a + str(b.name) + ", "
+        return str(a)
 
 
 class WeaponSkill(models.Model):

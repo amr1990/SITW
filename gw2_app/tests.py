@@ -28,6 +28,7 @@ class WrongLogInTest(TestCase):
         response = self.client.login(**self.falseCredentials)
         self.assertFalse(response)
 
+
 class CreateCharacterTest(TestCase):
     def setUp(self):
         self.credentials = {

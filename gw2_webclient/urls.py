@@ -57,5 +57,8 @@ urlpatterns = [
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^builds/$', views.createBuild, name='create_build'),
     url(r'^builds/weaponsets', views.createSet, name='create_weaponset'),
+    url(r'^builds/list', views.list_builds, name='list_build'),
+    url(r'^builds/delete', views.delete_builds, name='delete_build'),
+    url(r'^builds/(?P<id>.*)/edit', views.edit_builds, name='edit_build'),
 ]
 

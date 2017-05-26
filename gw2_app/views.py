@@ -7,7 +7,7 @@ import bs4
 import requests
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response, render
+from django.shortcuts import  render
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, permissions
@@ -51,7 +51,7 @@ url_services = {
 @csrf_exempt
 def register(request):
     # Like before, get the request's context.
-    context = RequestContext(request)
+
 
     # A boolean value for telling the template whether the registration was successful.
     # Set to False initially. Code changes value to True when registration succeeds.
@@ -92,20 +92,19 @@ def register(request):
         profile_form = ProfileForm()
 
     # Render the template depending on the context.
-    return render_to_response(
+    return render(request,
         'registration/register.html',
-        {'user_form': user_form, 'profile_form': profile_form, 'registered': registered},
-        context)
+        {'user_form': user_form, 'profile_form': profile_form, 'registered': registered}
+        )
 
 
 def homepage(request):
-    context = RequestContext(request)
-    return render_to_response("homepage.html", {}, context)
+
+    return render(request,"homepage.html", {})
 
 
 @login_required
 def getCharacterList(request):
-    context = RequestContext(request)
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
         profile = Profile.objects.filter(user=user).get()
@@ -114,15 +113,13 @@ def getCharacterList(request):
     req_char = requests.get(URL_char)
     data_char = json.loads(req_char.text)
 
-    return render_to_response(
+    return render(request,
         'characters.html',
-        {'characters': data_char},
-        context)
+        {'characters': data_char})
 
 
 @login_required
 def getCharacterInfo(request):
-    context = RequestContext(request)
     charname = request.GET.get('name')
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
@@ -143,14 +140,12 @@ def getCharacterInfo(request):
             else:
                 res = unicode(data_charinfo[item])
             char_info.append([string.capwords(item), res])
-    return render_to_response(
+    return render(request,
         'infochar.html',
-        {'charinfo': char_info},
-        context)
+        {'charinfo': char_info})
 
 
 def getInventory(request):
-    context = RequestContext(request)
     charname = request.GET.get('name')
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
@@ -172,12 +167,11 @@ def getInventory(request):
                 itemname = data_items["name"]
                 return_response_inventory.append((itemname, item["count"]))
 
-    return render_to_response('inventory.html', {'inventory': return_response_inventory, 'name': charname}, context)
+    return render(request,'inventory.html', {'inventory': return_response_inventory, 'name': charname})
 
 
 @login_required
 def getGear(request):
-    context = RequestContext(request)
     charname = request.GET.get('name')
 
     if request.user.is_authenticated():
@@ -211,12 +205,11 @@ def getGear(request):
                 stat_data.append(("Stat Choice", data_stat["name"]))
         return_response_gear.append((itemname, itemtype, stat_data))
 
-    return render_to_response('gear.html', {'stats': return_response_gear, 'name': charname}, context)
+    return render(request,'gear.html', {'stats': return_response_gear, 'name': charname})
 
 
 @login_required
 def getBank(request):
-    context = RequestContext(request)
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
         profile = Profile.objects.filter(user=user).get()
@@ -235,14 +228,12 @@ def getBank(request):
             itemname = data_items["name"]
             return_response_bank.append((itemname, item["count"]))
 
-    return render_to_response(
+    return render(request,
         'bank.html',
-        {'bank': return_response_bank},
-        context)
+        {'bank': return_response_bank})
 
 
 def getEvents(request):
-    context = RequestContext(request)
     url = urllib2.urlopen('https://wiki.guildwars2.com/wiki/World_boss')
     htmlpage = url.read()
     url.close()
@@ -261,26 +252,22 @@ def getEvents(request):
     for i in item_clean:
         item_final.append([line for line in i.split('\n') if line.strip() != ''])
 
-    return render_to_response(
+    return render(request,
         'events.html',
-        {'events': item_final},
-        context)
+        {'events': item_final})
 
 
 def getInfoProfession(request):
-    context = RequestContext(request)
     URL_professions = URL + url_services["professions"]
     req_professions = requests.get(URL_professions)
     data_professions = json.loads(req_professions.text)
 
-    return render_to_response(
+    return render(request,
         'professions.html',
-        {'professions': data_professions},
-        context)
+        {'professions': data_professions})
 
 
 def getTraining(request, prof_id):
-    context = RequestContext(request)
     profnameurl = "/" + prof_id
     URL_professions = URL + url_services["professions"] + profnameurl
     req_professions = requests.get(URL_professions)
@@ -303,15 +290,13 @@ def getTraining(request, prof_id):
         return_list.append([training["name"], track_list])
         track_list = []
 
-    return render_to_response(
+    return render(request,
         'training.html',
         {'trainings': return_list,
-         'prof': prof_id},
-        context)
+         'prof': prof_id})
 
 
 def getWeapons(request, prof_id):
-    context = RequestContext(request)
     profnameurl = "/" + prof_id
     URL_professions = URL + url_services["professions"] + profnameurl
     req_professions = requests.get(URL_professions)
@@ -336,16 +321,14 @@ def getWeapons(request, prof_id):
         skills = []
         cont += 1
 
-    return render_to_response(
+    return render(request,
         'weapons.html',
         {'weapons': weaponlist,
          'skills': response,
-         'prof': prof_id},
-        context)
+         'prof': prof_id})
 
 
 def getProfessionSkills(request, prof_id):
-    context = RequestContext(request)
     profnameurl = "/" + prof_id
     URL_professions = URL + url_services["professions"] + profnameurl
     req_professions = requests.get(URL_professions)
@@ -358,21 +341,18 @@ def getProfessionSkills(request, prof_id):
         data_skills = json.loads(req_skills.text)
         return_skills.append((data_skills["name"], skills["slot"], data_skills["description"]))
 
-    return render_to_response(
+    return render(request,
         'professionskills.html',
         {'skills': return_skills,
-         'prof': prof_id},
-        context)
+         'prof': prof_id})
 
 
 def tradingPost(request):
-    context = RequestContext(request)
-    return render_to_response("trading_post.html", {}, context)
+    return render(request,"trading_post.html", {})
 
 
 @login_required
 def getTradingPostCurrent(request):
-    context = RequestContext(request)
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
@@ -410,15 +390,13 @@ def getTradingPostCurrent(request):
                                               item["price"],
                                               item["created"].encode("utf-8")))
 
-    return render_to_response(
+    return render(request,
         'trading_post_current.html',
-        {'buys': return_response_current_buys, 'sells': return_response_current_sells},
-        context)
+        {'buys': return_response_current_buys, 'sells': return_response_current_sells})
 
 
 @login_required
 def getTradingPostHistory(request):
-    context = RequestContext(request)
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
@@ -458,14 +436,12 @@ def getTradingPostHistory(request):
                                               item["created"].encode("utf-8"),
                                               item["purchased"].encode("utf-8")))
 
-    return render_to_response(
+    return render(request,
         'trading_post_history.html',
-        {'buys': return_response_history_buys, 'sells': return_response_history_sells},
-        context)
+        {'buys': return_response_history_buys, 'sells': return_response_history_sells})
 
 
 def getDailyAchievement(request):
-    context = RequestContext(request)
     token = "?id="
     URL_daily = URL + url_services["achievements"] + url_services["daily"]
     req_daily = requests.get(URL_daily)
@@ -484,20 +460,17 @@ def getDailyAchievement(request):
             data_achiv = json.loads(req_achiv.text)
             return_response.append((data_achiv["name"], data_achiv["requirement"]))
 
-    return render_to_response(
+    return render(request,
         'daily.html',
-        {'achievements': return_response},
-        context)
+        {'achievements': return_response})
 
 
 def pvp(request):
-    context = RequestContext(request)
-    return render_to_response("pvp.html", {}, context)
+    return render(request,"pvp.html", {})
 
 
 @login_required
 def getPvPStats(request):
-    context = RequestContext(request)
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
@@ -539,17 +512,15 @@ def getPvPStats(request):
                                                     data_pvpstats["professions"][profession]["wins"],
                                                     data_pvpstats["professions"][profession]["losses"]))
 
-    return render_to_response(
+    return render(request,
         'pvp_stats.html',
         {'stats': return_response_winloss_stats,
          'professions': return_response_winloss_professions,
-         'standings': return_response_standings},
-        context)
+         'standings': return_response_standings})
 
 
 @login_required
 def getPvPGames(request):
-    context = RequestContext(request)
 
     if request.user.is_authenticated():
         user = User.objects.get(id=request.user.id)
@@ -579,16 +550,14 @@ def getPvPGames(request):
                                           data_current_game["scores"]["red"],
                                           data_current_game["scores"]["blue"]))
 
-    return render_to_response(
+    return render(request,
         'pvp_games.html',
-        {'games': return_response_pvp_games},
-        context)
+        {'games': return_response_pvp_games})
 
 
 @csrf_exempt
 @login_required
 def createCharacter(request):
-    context = RequestContext(request)
     if request.method == "POST":
         CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
 
@@ -612,23 +581,21 @@ def createCharacter(request):
     else:
         CreateCharacterForm = forms.CreateCharacterForm()
 
-    return render_to_response("createcharacter.html", {'CreateCharacterForm': CreateCharacterForm}, context)
+    return render(request,"createcharacter.html", {'CreateCharacterForm': CreateCharacterForm})
 
 
 @csrf_exempt
 def characterCreated(request):
-    context = RequestContext(request)
-    return render_to_response("charactercreated.html", {}, context)
+    return render(request,"charactercreated.html", {})
 
 
 @login_required
 def list_characters(request):
     l = []
-    context = RequestContext(request)
     for i in Character.objects.all():
         l.append(i)
     l.reverse()
-    return render_to_response("characters_list.html", {'list': l}, context)
+    return render(request,"characters_list.html", {'list': l})
 
 
 @csrf_exempt
@@ -759,7 +726,6 @@ class APISpecList(generics.ListCreateAPIView):
 @csrf_exempt
 @login_required
 def createBuild(request):
-    context = RequestContext(request)
     if request.method == "POST":
         CreateBuildForm = forms.BuildForm(data=request.POST)
 
@@ -769,7 +735,8 @@ def createBuild(request):
             build.name = CreateBuildForm.cleaned_data['name']
             build.profession = CreateBuildForm.cleaned_data['profession']
             build.weaponset = [object for object in CreateBuildForm.cleaned_data['weaponset']]
-
+            build.character = CreateBuildForm.cleaned_data['character']
+            build.save()
             return HttpResponseRedirect('/characters/create/created')
 
         else:
@@ -778,12 +745,11 @@ def createBuild(request):
     else:
         CreateBuildForm = forms.BuildForm()
 
-    return render_to_response("builds.html", {'CreateBuildForm': CreateBuildForm}, context)
+    return render(request,"builds.html", {'CreateBuildForm': CreateBuildForm})
 
 
 @csrf_exempt
 def createSet(request):
-    context = RequestContext(request)
     if request.method == "POST":
         CreateSetForm = forms.WeaponSetForm(data=request.POST)
 
@@ -791,8 +757,10 @@ def createSet(request):
             set = WeaponSet()
             set.save()
 
-            set.name=CreateSetForm.cleaned_data['name']
-            set.weapon1 = [object for object in CreateSetForm.cleaned_data['weapon1']]
+            setlist = [object for object in CreateSetForm.cleaned_data['weapon1']]
+            set.weapon1 = setlist
+            assert len(setlist) > 2
+
 
             set.save()
 
@@ -804,4 +772,53 @@ def createSet(request):
     else:
         CreateSetForm = forms.WeaponSetForm()
 
-    return render_to_response("weaponsets.html", {'SetsForm': CreateSetForm}, context)
+    return render(request,"weaponsets.html", {'SetsForm': CreateSetForm})
+
+
+@csrf_exempt
+@login_required
+def delete_builds(request):
+    if Build.objects.filter(name=request.GET.get('name')).exists():
+        a = Build.objects.filter(name=request.GET.get('name')).get()
+        if a.character.player.user.username == request.user.username:
+            Build.objects.get(name=request.GET.get('name')).delete()
+
+        return HttpResponseRedirect("/builds/list")
+
+
+@login_required
+def list_builds(request):
+    l = []
+    context = RequestContext(request)
+    for i in Build.objects.all():
+        l.append((i.name, i.profession.name, [str(object) for object in i.weaponset.all()], i.character.name))
+    l.reverse()
+    return render_to_response("list_build.html", {'list': l}, context)
+
+
+def edit_builds(request, id):
+    build = Build.objects.get(name=id)
+    if build.character.player.user.username == request.user.username:
+        if request.method == "POST":
+            CreateBuildForm = forms.BuildForm(data=request.POST)
+
+            if CreateBuildForm.is_valid():
+                build_form = forms.BuildForm(request.POST, instance=build)
+                build_form.save()
+                return HttpResponseRedirect('/builds/list')
+            else:
+                build = Build.objects.get(name=id)
+                CreateBuildForm = forms.BuildForm(instance=build)
+                if CreateBuildForm.is_valid():
+                    build.name = CreateBuildForm.cleaned_data['name']
+                    build.profession = CreateBuildForm.cleaned_data['profession']
+                    build.weaponset = [object for object in CreateBuildForm.cleaned_data['weaponset']]
+                    build.character = CreateBuildForm.cleaned_data['character']
+                    build.save()
+                    return HttpResponseRedirect('/builds/list')
+        else:
+            CreateBuildForm = forms.BuildForm(instance=build)
+
+        return render(request, "edit_builds.html", {'buildform': CreateBuildForm})
+    else:
+        return HttpResponseRedirect("/builds/list")
