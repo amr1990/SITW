@@ -30,15 +30,6 @@ class Profile(models.Model):
         return self.user.username
 
 
-class Specialization(models.Model):
-    name = models.CharField(max_length=50, null=True)
-    profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
-    iselite = models.NullBooleanField()
-
-    def __unicode__(self):
-        return str(self.name)
-
-
 class ProfessionBuild(models.Model):
     name = models.CharField(max_length=50, null=True, blank=False)
     weapons = models.ManyToManyField('Weapon')
@@ -72,36 +63,6 @@ class WeaponSet(models.Model):
         for b in self.weapon1.all():
             a = a + str(b.name) + ", "
         return str(a)
-
-
-class WeaponSkill(models.Model):
-    name = models.CharField(max_length=30, null=True)
-    description = models.TextField()
-    weapon = models.ForeignKey('Weapon', on_delete=models.CASCADE, null=True)
-    profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
-
-    def __unicode__(self):
-        return str(self.name)
-
-
-class ProfessionSkill(models.Model):
-    name = models.CharField(max_length=30, null=True)
-    description = models.TextField()
-    profession = models.ForeignKey('ProfessionBuild', on_delete=models.CASCADE, null=True)
-    build = models.ForeignKey('Build', on_delete=models.CASCADE, null=True)
-
-    def __unicode__(self):
-        return str(self.name)
-
-
-class Trait(models.Model):
-    name = models.CharField(max_length=30, null=True)
-    description = models.TextField()
-    spec = models.ForeignKey('Specialization', on_delete=models.CASCADE, null=True)
-    ismajor = models.NullBooleanField()
-
-    def __unicode__(self):
-        return str(self.name)
 
 
 class Character(models.Model):

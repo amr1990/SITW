@@ -686,41 +686,11 @@ class APIProfessionBuildDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfessionSerializer
 
 
-class APIWeaponSkillList(generics.ListCreateAPIView):
-    model = WeaponSkill
-    queryset = WeaponSkill.objects.all()
-    serializer_class = WeaponSkillSerializer
-
-
 class APICharacterDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsOwnerOrReadOnly,)
     model = Character
     queryset = Character.objects.all()
     serializer_class = CharacterSerializer
-
-
-class APITraitsDetail(generics.RetrieveUpdateDestroyAPIView):
-    model = Trait
-    queryset = Trait.objects.all()
-    serializer_class = TraitSerializer
-
-
-class APITraitsList(generics.ListCreateAPIView):
-    model = Trait
-    queryset = Trait.objects.all()
-    serializer_class = TraitSerializer
-
-
-class APISpecDetail(generics.RetrieveUpdateDestroyAPIView):
-    model = Specialization
-    queryset = Specialization.objects.all()
-    serializer_class = SpecSerializer
-
-
-class APISpecList(generics.ListCreateAPIView):
-    model = Specialization
-    queryset = Specialization.objects.all()
-    serializer_class = SpecSerializer
 
 
 @csrf_exempt

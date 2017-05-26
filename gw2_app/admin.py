@@ -5,10 +5,6 @@ from models import *
 
 admin.site.register(ProfessionBuild)
 admin.site.register(Weapon)
-admin.site.register(WeaponSkill)
-admin.site.register(Trait)
-admin.site.register(ProfessionSkill)
-admin.site.register(Specialization)
 admin.site.register(Profile)
 admin.site.register(WeaponSet)
 admin.site.register(Build)
