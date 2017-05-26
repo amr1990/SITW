@@ -633,40 +633,47 @@ def list_characters(request):
 
 @csrf_exempt
 @login_required
+@csrf_exempt
+@login_required
 def edit_characters(request, id):
     char = Character.objects.get(name=id)
-    if request.method == "POST":
-        CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
+    if char.player.user.username == request.user.username:
+        if request.method == "POST":
+            CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
 
-        if CreateCharacterForm.is_valid():
-            char_form = forms.CreateCharacterForm(request.POST, instance=char)
-            char_form.save()
-            return HttpResponseRedirect('/characters/list')
-        else:
-            char = Character.objects.get(name=id)
-            CreateCharacterForm = forms.CreateCharacterForm(instance=char)
             if CreateCharacterForm.is_valid():
-                new_character = Character(
-                    name=CreateCharacterForm.cleaned_data['name'],
-                    race=CreateCharacterForm.cleaned_data['race'],
-                    gender=CreateCharacterForm.cleaned_data['gender'],
-                    level=CreateCharacterForm.cleaned_data['level'],
-                    guild=CreateCharacterForm.cleaned_data['guild'],
-                    profession_type=CreateCharacterForm.cleaned_data["profession_type"]
-                )
-                new_character.save()
-                return HttpResponseRedirect("/characters/list")
-    else:
-        CreateCharacterForm = forms.CreateCharacterForm(instance=char)
+                char_form = forms.CreateCharacterForm(request.POST, instance=char)
+                char_form.save()
+                return HttpResponseRedirect('/characters/list')
+            else:
+                char = Character.objects.get(name=id)
+                CreateCharacterForm = forms.CreateCharacterForm(instance=char)
+                if CreateCharacterForm.is_valid():
+                    new_character = Character(
+                        name=CreateCharacterForm.cleaned_data['name'],
+                        race=CreateCharacterForm.cleaned_data['race'],
+                        gender=CreateCharacterForm.cleaned_data['gender'],
+                        level=CreateCharacterForm.cleaned_data['level'],
+                        guild=CreateCharacterForm.cleaned_data['guild'],
+                        profession_type=CreateCharacterForm.cleaned_data["profession_type"]
+                    )
+                    new_character.save()
+                    return HttpResponseRedirect("/characters/list")
+        else:
+            CreateCharacterForm = forms.CreateCharacterForm(instance=char)
 
-    return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
+        return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
+    else:
+        return HttpResponseRedirect("/characters/list")
 
 
 @csrf_exempt
 @login_required
 def delete_characters(request):
     if Character.objects.filter(name=request.GET.get('name')).exists():
-        Character.objects.get(name=request.GET.get('name')).delete()
+        a = Character.objects.filter(name=request.GET.get('name')).get()
+        if a.player.user.username == request.user.username:
+            Character.objects.get(name=request.GET.get('name')).delete()
 
         return HttpResponseRedirect("/characters/list")
 
