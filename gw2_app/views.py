@@ -635,38 +635,43 @@ def list_characters(request):
 @login_required
 def edit_characters(request, id):
     char = Character.objects.get(name=id)
-    if request.method == "POST":
-        CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
+    if char.player.user.username == request.user.username:
+        if request.method == "POST":
+            CreateCharacterForm = forms.CreateCharacterForm(data=request.POST)
 
-        if CreateCharacterForm.is_valid():
-            char_form = forms.CreateCharacterForm(request.POST, instance=char)
-            char_form.save()
-            return HttpResponseRedirect('/characters/list')
-        else:
-            char = Character.objects.get(name=id)
-            CreateCharacterForm = forms.CreateCharacterForm(instance=char)
             if CreateCharacterForm.is_valid():
-                new_character = Character(
-                    name=CreateCharacterForm.cleaned_data['name'],
-                    race=CreateCharacterForm.cleaned_data['race'],
-                    gender=CreateCharacterForm.cleaned_data['gender'],
-                    level=CreateCharacterForm.cleaned_data['level'],
-                    guild=CreateCharacterForm.cleaned_data['guild'],
-                    profession_type=CreateCharacterForm.cleaned_data["profession_type"]
-                )
-                new_character.save()
-                return HttpResponseRedirect("/characters/list")
-    else:
-        CreateCharacterForm = forms.CreateCharacterForm(instance=char)
+                char_form = forms.CreateCharacterForm(request.POST, instance=char)
+                char_form.save()
+                return HttpResponseRedirect('/characters/list')
+            else:
+                char = Character.objects.get(name=id)
+                CreateCharacterForm = forms.CreateCharacterForm(instance=char)
+                if CreateCharacterForm.is_valid():
+                    new_character = Character(
+                        name=CreateCharacterForm.cleaned_data['name'],
+                        race=CreateCharacterForm.cleaned_data['race'],
+                        gender=CreateCharacterForm.cleaned_data['gender'],
+                        level=CreateCharacterForm.cleaned_data['level'],
+                        guild=CreateCharacterForm.cleaned_data['guild'],
+                        profession_type=CreateCharacterForm.cleaned_data["profession_type"]
+                    )
+                    new_character.save()
+                    return HttpResponseRedirect("/characters/list")
+        else:
+            CreateCharacterForm = forms.CreateCharacterForm(instance=char)
 
-    return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
+        return render(request, "edit_characters.html", {'CreateCharacterForm': CreateCharacterForm})
+    else:
+        return HttpResponseRedirect("/characters/list")
 
 
 @csrf_exempt
 @login_required
 def delete_characters(request):
     if Character.objects.filter(name=request.GET.get('name')).exists():
-        Character.objects.get(name=request.GET.get('name')).delete()
+        a = Character.objects.filter(name=request.GET.get('name')).get()
+        if a.player.user.username == request.user.username:
+            Character.objects.get(name=request.GET.get('name')).delete()
 
         return HttpResponseRedirect("/characters/list")
 
@@ -762,7 +767,8 @@ def createBuild(request):
             build.name = CreateBuildForm.cleaned_data['name']
             build.profession = CreateBuildForm.cleaned_data['profession']
             build.weaponset = [object for object in CreateBuildForm.cleaned_data['weaponset']]
-
+            build.character = CreateBuildForm.cleaned_data['character']
+            build.save()
             return HttpResponseRedirect('/characters/create/created')
 
         else:
@@ -784,8 +790,10 @@ def createSet(request):
             set = WeaponSet()
             set.save()
 
-            set.name=CreateSetForm.cleaned_data['name']
-            set.weapon1 = [object for object in CreateSetForm.cleaned_data['weapon1']]
+            setlist = [object for object in CreateSetForm.cleaned_data['weapon1']]
+            set.weapon1 = setlist
+            assert len(setlist) > 2
+
 
             set.save()
 
@@ -798,3 +806,52 @@ def createSet(request):
         CreateSetForm = forms.WeaponSetForm()
 
     return render_to_response("weaponsets.html", {'SetsForm': CreateSetForm}, context)
+
+
+@csrf_exempt
+@login_required
+def delete_builds(request):
+    if Build.objects.filter(name=request.GET.get('name')).exists():
+        a = Build.objects.filter(name=request.GET.get('name')).get()
+        if a.character.player.user.username == request.user.username:
+            Build.objects.get(name=request.GET.get('name')).delete()
+
+        return HttpResponseRedirect("/builds/list")
+
+
+@login_required
+def list_builds(request):
+    l = []
+    context = RequestContext(request)
+    for i in Build.objects.all():
+        l.append((i.name, i.profession.name, [str(object) for object in i.weaponset.all()], i.character.name))
+    l.reverse()
+    return render_to_response("list_build.html", {'list': l}, context)
+
+
+def edit_builds(request, id):
+    build = Build.objects.get(name=id)
+    if build.character.player.user.username == request.user.username:
+        if request.method == "POST":
+            CreateBuildForm = forms.BuildForm(data=request.POST)
+
+            if CreateBuildForm.is_valid():
+                build_form = forms.BuildForm(request.POST, instance=build)
+                build_form.save()
+                return HttpResponseRedirect('/builds/list')
+            else:
+                build = Build.objects.get(name=id)
+                CreateBuildForm = forms.BuildForm(instance=build)
+                if CreateBuildForm.is_valid():
+                    build.name = CreateBuildForm.cleaned_data['name']
+                    build.profession = CreateBuildForm.cleaned_data['profession']
+                    build.weaponset = [object for object in CreateBuildForm.cleaned_data['weaponset']]
+                    build.character = CreateBuildForm.cleaned_data['character']
+                    build.save()
+                    return HttpResponseRedirect('/builds/list')
+        else:
+            CreateBuildForm = forms.BuildForm(instance=build)
+
+        return render(request, "edit_builds.html", {'buildform': CreateBuildForm})
+    else:
+        return HttpResponseRedirect("/builds/list")

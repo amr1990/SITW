@@ -14,8 +14,8 @@ class UserForm(forms.ModelForm):
 
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model=Profile
-        fields=('city', 'country', 'apikey')
+        model = Profile
+        fields = ('city', 'country', 'apikey')
 
 
 class CreateCharacterForm(forms.ModelForm):
@@ -27,13 +27,13 @@ class CreateCharacterForm(forms.ModelForm):
 class BuildForm(forms.ModelForm):
     class Meta:
         model = Build
-        fields = ('name', 'profession', 'weaponset')
+        fields = ('name', 'profession', 'weaponset', 'character')
 
 
 class WeaponSetForm(forms.ModelForm):
     class Meta:
         model = WeaponSet
-        fields = ('name', 'weapon1')
+        fields = ('weapon1',)
 
 
 
