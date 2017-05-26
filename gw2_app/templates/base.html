@@ -15,13 +15,13 @@
   {% if user.is_authenticated %}
                 <ul class="nav navbar-nav navbar-right">
                     <li><a> Logged in as {{ user }}</a></li>
-                    <li><a href="accounts/logout"> Logout </a></li>
+                    <li><a href="{% url 'logout' %}?next={{request.path}}"> Logout </a></li>
                 </ul>
 
             {% else %}
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/account/register/">Register</a></li>
-                    <li><a href="/accounts/login/">LogIn</a></li>
+                    <li><a href="/registration/register/">Register</a></li>
+                    <li><a href="{% url 'login' %}?next={{request.path}}"">LogIn</a></li>
                 </ul>
             {% endif %}
     {% endblock %}
