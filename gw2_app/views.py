@@ -600,6 +600,8 @@ def list_characters(request):
 
 @csrf_exempt
 @login_required
+@csrf_exempt
+@login_required
 def edit_characters(request, id):
     char = Character.objects.get(name=id)
     if char.player.user.username == request.user.username:
