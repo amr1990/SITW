@@ -760,9 +760,10 @@ def createSet(request):
             setlist = [object for object in CreateSetForm.cleaned_data['weapon1']]
             set.weapon1 = setlist
 
+
             set.save()
 
-            return HttpResponseRedirect('/builds')
+            return HttpResponseRedirect('/builds/')
 
         else:
             print(CreateSetForm.errors)
