@@ -118,7 +118,7 @@ class Character(models.Model):
     )
 
     player = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=20, null=False, unique=True)
+    name = models.CharField(max_length=20, null=False)
     race = models.CharField(max_length=10, choices=RACE)
     gender = models.CharField(max_length=10, choices=GENDER)
     level = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(80)])

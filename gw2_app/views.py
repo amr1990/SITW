@@ -613,7 +613,7 @@ def edit_characters(request, id):
                 char_form.save()
                 return HttpResponseRedirect('/characters/list')
             else:
-                char = Character.objects.get(name=id)
+                char = Character.objects.filter(name=id).get()
                 CreateCharacterForm = forms.CreateCharacterForm(instance=char)
                 if CreateCharacterForm.is_valid():
                     new_character = Character(
@@ -789,11 +789,10 @@ def delete_builds(request):
 @login_required
 def list_builds(request):
     l = []
-    context = RequestContext(request)
     for i in Build.objects.all():
         l.append((i.name, i.profession.name, [str(object) for object in i.weaponset.all()], i.character.name))
     l.reverse()
-    return render_to_response("list_build.html", {'list': l}, context)
+    return render(request, "list_build.html", {'list': l})
 
 
 def edit_builds(request, id):
@@ -822,3 +821,12 @@ def edit_builds(request, id):
         return render(request, "edit_builds.html", {'buildform': CreateBuildForm})
     else:
         return HttpResponseRedirect("/builds/list")
+
+
+@login_required
+def list_set(request):
+    l = []
+    for i in WeaponSet.objects.all():
+        l.append([str(object) for object in i.weapon1.all()])
+    l.reverse()
+    return render(request, "list_sets.html", {'list': l})

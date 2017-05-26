@@ -1,0 +1,23 @@
+{%extends "base.html" %}
+{% block content %}
+<div class="text-center">
+    <h1>Customized WeaponSets</h1>
+</div>
+
+
+    <div class="sets_table">
+      <table border="2px">
+            <tr>
+                <th >Weapons </th>
+            </tr>
+    {% for i in list %}
+            <tr>
+                <td>{{ i }}</td>
+
+            </tr>
+    {% endfor %}
+
+        </table>
+    </div>
+
+{% endblock %}
