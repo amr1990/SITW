@@ -2,7 +2,6 @@ from django.test import TestCase
 from gw2_app.forms import *
 from gw2_app.models import *
 
-
 class LogInTest(TestCase):
     def setUp(self):
         self.credentials = {
@@ -201,63 +200,3 @@ class WrongDeleteCharacterTest(TestCase):
         response = self.client.post('/characters/delete/?name=' + self.Character['name'])
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Character.objects.count(), self.ccount)
-
-
-class CreateWeaponSetTest(TestCase):
-    def setUp(self):
-        self.credentials = {
-            'username': 'test5',
-            'password': '8900'}
-        User.objects.create_user(**self.credentials)
-        Weapon.objects.create(name='Dagger')
-        self.WeaponSet = {
-            'weapon1': [Weapon.objects.filter(name='Dagger').get()]
-        }
-        self.client.login(**self.credentials)
-
-    def test_createWeaponSet(self):
-        form = WeaponSetForm(data=self.WeaponSet)
-        self.assertTrue(form.is_valid())
-        response = self.client.post('/characters/create/', self.Character)
-        new_ccount = Character.objects.count()
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(new_ccount, self.ccount+1)
-
-
-'''class CreateBuildTest(TestCase):
-    def setUp(self):
-        self.credentials = {
-            'username': 'test5',
-            'password': '8900'}
-        u = User.objects.create_user(**self.credentials)
-        p = Profile.objects.create(user=u,
-                               apikey="53E26455-4E94-524E-AD8A-3D55E9EDAD73223663B8-9503-4414-A9F4-3734F7BC50C1",
-                               city="city", country="country")
-        self.Character = {
-            'name': 'Espidow',
-            'race': 'Human',
-            'gender': 'Male',
-            'level': '80',
-            'guild': 'Best Thief and programmer',
-            'profession_type': 'Thief',
-        }
-        self.WeaponSet = {
-            'weaponset': ['dagger']
-        }
-        self.client.login(**self.credentials)
-        self.client.post('/characters/create/', self.Character)
-        self.Build = {
-            'name': 'testbuild',
-            'profession': 'Thief',
-            'weaponset': self.WeaponSet,
-            'character': self.Character,
-        }
-
-    def test_createBuild(self):
-        form = CreateCharacterForm(data=self.Character)
-        self.assertTrue(form.is_valid())'''
-
-'''response = self.client.post('/characters/create/', self.Character)
-        new_ccount = Character.objects.count()
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(new_ccount, self.ccount+1)'''

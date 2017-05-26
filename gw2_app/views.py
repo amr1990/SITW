@@ -759,12 +759,10 @@ def createSet(request):
 
             setlist = [object for object in CreateSetForm.cleaned_data['weapon1']]
             set.weapon1 = setlist
-            assert len(setlist) > 2
-
 
             set.save()
 
-            return HttpResponseRedirect('/characters/create/created')
+            return HttpResponseRedirect('/builds')
 
         else:
             print(CreateSetForm.errors)
