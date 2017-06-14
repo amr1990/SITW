@@ -1,5 +1,6 @@
 {%extends "base.html" %}
 {% block content %}
+<span vocab="http://schema.org/" typeof="Thing">
 <div class="text-center">
     <h1>Customized Builds</h1>
 </div>
@@ -16,10 +17,10 @@
             </tr>
     {% for i in list %}
             <tr>
-                <td>{{ i.0 }}</td>
-                <td>{{ i.1 }}</td>
-                <td>{{ i.2 }}</td>
-                <td>{{ i.3 }}</td>
+                <td><span property="description">{{ i.0 }}</span></td>
+                <td><span property="description">{{ i.1 }}</span></td>
+                <td><span property="description">{{ i.2 }}</span></td>
+                <td><span property="description">{{ i.3 }}</span></td>
                 <td><a href="/builds/{{i.0}}/edit/"><strong>Edit</strong></a></td>
                 <td><a href="/builds/delete/?name={{i.0}}"><strong>Delete</strong></a></td>
 
@@ -28,5 +29,5 @@
 
         </table>
     </div>
-
+</span>
 {% endblock %}

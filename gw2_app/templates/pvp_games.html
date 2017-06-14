@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <meta charset="UTF-8">
+<span vocab="http://schema.org/" typeof="Game">
 <h1>Information for PvP games:</h1>
     <h2> Games </h2>
     <table border="1">
@@ -14,16 +15,17 @@
         </tr>
         {% for game in games %}
             <tr>
-                <td>{{ game.0 }}</td>
-                <td>{{ game.1 }}</td>
-                <td>{{ game.2 }}</td>
-                <td>{{ game.3 }}</td>
-                <td>{{ game.4 }}</td>
-                <td>{{ game.5 }}</td>
+                <td><span property="gameLocation">{{ game.0 }}</span></td>
+                <td><span property="description">{{ game.1 }}</span></td>
+                <td><span property="description">{{ game.2 }}</span></td>
+                <td><span property="description">{{ game.3 }}</span></td>
+                <td><span property="description">{{ game.4 }}</span></td>
+                <td><span property="description">{{ game.5 }}</span></td>
             </tr>
         {% endfor %}
     </table>
     {% for items in games %}
         <br> </br>
     {% endfor %}
+</span>
 {% endblock %}

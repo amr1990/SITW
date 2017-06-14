@@ -1,5 +1,7 @@
 {%extends "base.html" %}
 {% block content %}
+<span vocab="http://schema.org/" typeof="Game">
+<span rel="character">
 <div class="text-center">
     <h1>Customized Characters</h1>
 </div>
@@ -17,12 +19,12 @@
             </tr>
     {% for i in list %}
             <tr>
-                <td>{{ i.name }}</td>
-                <td>{{ i.race }}</td>
-                <td>{{ i.gender }}</td>
-                <td>{{ i.level }}</td>
-                <td>{{ i.guild }}</td>
-                <td>{{ i.profession_type }}</td>
+                <td><span property="name">{{ i.name }}</span></td>
+                <td><span property="description">{{ i.race }}</span></td>
+                <td><span property="gender">{{ i.gender }}</span></td>
+                <td><span property="description">{{ i.level }}</span></td>
+                <td><span property="description">{{ i.guild }}</span></td>
+                <td><span property="jobTitle">{{ i.profession_type }}</span></td>
                 <td><a href="/characters/{{i.name}}/edit/"><strong>Edit</strong></a></td>
                 <td><a href="/characters/delete/?name={{i.name}}"><strong>Delete</strong></a></td>
             </tr>
@@ -30,5 +32,6 @@
 
         </table>
     </div>
-
+</span>
+</span>
 {% endblock %}

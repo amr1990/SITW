@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <meta charset="UTF-8">
+<span vocab="http://schema.org/" typeof="Game">
 <h1>Information for events</h1>
+<span rel="quest">
 <table border="1">
     <tr>
         <td><strong>Time(UTC)</strong></td>
@@ -10,10 +12,11 @@
     </tr>
     {% for event in events %}
     <tr>
-        <td>{{event.0}}</td>
-        <td>{{event.1}}</td>
-        <td>{{event.2}}</td>
+        <td><span property="description">{{event.0}}</td>
+        <td><span property="name">{{event.1}}</span></td>
+        <td><span property="name">{{event.2}}</span></td>
     </tr>
     {% endfor %}
-</table>
+</table></span>
+</span>
 {% endblock %}
